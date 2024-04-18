@@ -9,9 +9,18 @@ namespace ICTCapstoneProject.Controllers
     {
 
         [HttpGet]
-        public IActionResult Index(List<SelfReport> selfReports = null)
+        public IActionResult Index(List<SelfReport> selfReports)
         {
-            selfReports = selfReports == null ? new List<SelfReport>() : selfReports;
+        
+            if (selfReports == null)
+            {
+                selfReports = new List<SelfReport>();
+            }
+            else
+            {
+                selfReports = selfReports.ToList();
+            }
+
             return View(selfReports);
         }
 
@@ -29,8 +38,6 @@ namespace ICTCapstoneProject.Controllers
             #endregion
 
             var selfReports = this.GetSelfReportList(fileName);
-
-
             return Index(selfReports);
         }
 

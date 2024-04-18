@@ -62,14 +62,14 @@
                     <li class="list-inline-item">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="single" />
-                            <label class="form-check-label" for="single"> Single </label>
+                            <label class="form-check-label" for="single"> 
+                                Single 
+                            </label>
                         </div>
                     </li>
                     <li class="list-inline-item">
                         <div class="form-check">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="Multiple" />
+                            <input class="form-check-input" type="checkbox" id="Multiple" />
                             <label class="form-check-label" for="Multiple">
                                 Multiple
                             </label>
@@ -105,7 +105,7 @@
                                   asp-controller="SelfReport"
                                   asp-action="Index">
                                 <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                    <input type="file" name="file" class="form-control" />
+                                    <input type="file" name="file" class="form-control" required/>
                                 </div>
                             </form>
                         </div>
@@ -115,6 +115,7 @@
                                    form="uploadBaselineForm"
                                    value="Upload File"
                                    class="btn btn-primary" />
+                                  
                         </div>
                     </div>
                 </div>
@@ -266,7 +267,6 @@
 
 
         //create a dump dataset
-        //create a dump dataset
         var selfReports = @Html.Raw(Json.Serialize(Model));
         console.log(selfReports);
 
@@ -279,13 +279,8 @@
         // Define the x and y domains
 
         x.domain(d3.extent(selfReports, s => s.timeStamp));
-        if ([0, d3.max(selfReports, s => s.selfReport)] > [0, d3.max(selfReports, s => s.selfSegment)]) {
-            y.domain([0, d3.max(selfReports, s => s.selfReport)]);
-        }
-        else {
-            y.domain([0, d3.max(selfReports, s => s.selfSegment)]);
-        }
-
+        y.domain([0, d3.max(selfReports, s => s.selfReport)]);
+       
         // y.domain([0, d3.max(selfReports, s => s.selfReport)]);
 
         // Add the x-axis
@@ -325,4 +320,7 @@
             .attr("stroke-width", 3)
             .attr("d", lineSelfReport);
     </script>
+
+
+    
 </body>

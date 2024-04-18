@@ -190,7 +190,7 @@
         </div>
     </div>
 </section>
-
+<!--
 <div class="container px-4">
     <div class="row gx-4 justify-content-center">
         <div class="col-lg-10">
@@ -235,11 +235,15 @@
         </div>
     </div>
 </div>
-
+-->
 
 <body>
     <div id="chart-container"></div>
+    <div id="slider-range"></div>
+
+
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
     <style>
         .bar {
             fill: navy;
@@ -248,81 +252,116 @@
 <script>
     //Set dimensions and margins for the chart
 
-    const margin = { top: 70, right: 30, bottom: 40, left: 80 };
-    const width = 1200 - margin.left - margin.right;
-    const height = 500 - margin.top - margin.bottom;
+        const margin = { top: 70, right: 30, bottom: 40, left: 80 };
+        const width = 1200 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
 
-    //set up the x and y scales
-    const x = d3.scaleTime()
-        .range([0, width]);
-    const y = d3.scaleLinear()
-        .range([height, 0]);
+        // Set up the x and y scales
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
 
-    //create the SVG element and append it to the chart container
-    const svg = d3.select("#chart-container")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+        // Create the SVG element and append it to the chart container
+        const svg = d3.select("#chart-container")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
 
-
-    //create a dump dataset
-    //create a dump dataset
-    var gsrReport = @Html.Raw(Json.Serialize(Model));
+        // Dataset conversion
+        var gsrReport = @Html.Raw(Json.Serialize(Model));
     console.log(gsrReport);
 
-    gsrReport.forEach(function (d) {
-        d.ms = +d.ms; // Assuming TimeStamp is a date string
-        d.noUnits = +d.noUnits;
-        d.uS = +d.uS;
-        d.kOhms = +d.kOhms;
-        d.mV = +d.mV;
+        gsrReport.forEach(function (d) {
+            d.tSpan = new Date(d.tSpan); // Convert to Date object
+            d.noUnits = +d.noUnits;
+            d.uS = +d.uS;
+            d.kOhms = parseFloat(d.kOhms);
+            d.mV = parseFloat(d.mV);
+        });
 
-    });
+        // Define the x and y domains
+        x.domain(d3.extent(gsrReport, s => s.tSpan));
+        y.domain([0, d3.max(gsrReport, s => s.uS)]);
 
-    // Define the x and y domains
+        // Add the x-axis
+        svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x)
+                .ticks(d3.timeMinute.every(1))
+                .tickFormat(d3.timeFormat("%M:%S")));
 
-        x.domain(d3.extent(gsrReport, s => s.ms));
-    y.domain([0, d3.max(gsrReport, s => s.uS)]);
+        // Add the y-axis
+        svg.append("g")
+            .attr("class", "y-axis")
+            .call(d3.axisLeft(y));
 
-    // y.domain([0, d3.max(selfReports, s => s.selfReport)]);
+        // Create the line generator
+        const msLine = d3.line()
+            .x(s => x(s.tSpan))
+            .y(s => y(s.uS));
 
-    // Add the x-axis
+        // Add the line to the SVG
+        svg.append("path")
+            .datum(gsrReport)
+            .attr("class", "line")
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 3)
+            .attr("d", msLine);
 
-    svg.append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x)
-            .tickFormat(d3.format(".2f")));
+        // Slider configuration
+        const sliderRange = d3
+            .sliderBottom()
+            .min(d3.min(gsrReport, d => d.tSpan))
+            .max(d3.max(gsrReport, d => d.tSpan))
+            .width(300)
+            .tickFormat(d3.timeFormat("%M:%S"))
+            .ticks(3)
+            .default([d3.min(gsrReport, d => d.tSpan), d3.max(gsrReport, d => d.tSpan)])
+            .fill('#85bb65');
 
-    //Add the y-axis
-    svg.append("g")
-        .call(d3.axisLeft(y))
+        sliderRange.on('onchange', val => {
+            // Update x domain based on slider value
+            x.domain(val);
 
-    //Create the line generator
-    const kOhmsLine = d3.line()
-        .x(s => x(s.ms))
-        .y(s => y(s.kOhms));
+            // Filter data based on slider value
+            const filteredData = gsrReport.filter(d => d.tSpan >= val[0] && d.tSpan <= val[1]);
 
-    const mVLine = d3.line()
-        .x(s => x(s.ms))
-        .y(s => y(s.mV));
+            // Update the line generator function
+            const line = d3.line()
+                .x(d => x(d.tSpan))
+                .y(d => y(d.uS));
 
+            // Update y domain based on filtered data
+            y.domain([0, d3.max(filteredData, d => d.uS)]);
 
-    //Add the lineSegment to the SVG element
-    svg.append("path")
-        .datum(gsrReport)
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 3)
-        .attr("d", kOhmsLine);
+            // Update the x-axis
+            svg.select(".x-axis")
+                .call(d3.axisBottom(x)
+                    .ticks(d3.timeMinute.every(1))
+                    .tickFormat(d3.timeFormat("%M:%S")));
 
-    //Add the lineSegment to the SVG element
-    svg.append("path")
-        .datum(gsrReport)
-        .attr("fill", "none")
-        .attr("stroke", "red")
-        .attr("stroke-width", 3)
-        .attr("d", mVLine);
+            // Update the y-axis
+            svg.select(".y-axis")
+                .call(d3.axisLeft(y));
+
+            // Update the line
+            svg.select(".line")
+                .datum(filteredData)
+                .attr("d", line);
+        });
+
+        // Append the slider to the container
+        const gRange = d3
+            .select('#slider-range')
+            .append('svg')
+            .attr('width', 500)
+            .attr('height', 100)
+            .append('g')
+            .attr('transform', 'translate(90,30)');
+
+        gRange.call(sliderRange);
 </script>
 </body>
