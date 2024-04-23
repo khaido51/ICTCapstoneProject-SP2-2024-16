@@ -3,8 +3,8 @@ using System.Numerics;
 
 namespace ICTCapstoneProject.Models
 {
-    [Delimiter("\t")]
-    [CultureInfo("en-us")]
+    //[Delimiter("\t")]
+    //[CultureInfo("en-us")]
     public class GSR
     {
         [Index(0)]

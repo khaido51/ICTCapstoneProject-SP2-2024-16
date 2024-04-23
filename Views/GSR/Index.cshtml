@@ -84,39 +84,6 @@
     <div class="container px-4">
         <div class="row gx-4 justify-content-center">
             <div class="col-lg-8">
-                <div class="scene-name"><p>Scene</p></div>
-                <div class="container cont-2">
-                    <div class="row">
-                        <div class="col-2 d-flex align-items-center justify-content-center">
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       id="baseline" />
-                                <label class="form-check-label" for="baseline">
-                                    Baseline
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="col-4 d-flex align-items-center justify-content-center">
-                            <form method="post"
-                                  id="uploadBaselineForm"
-                                  enctype="multipart/form-data"
-                                  asp-controller="GSR"
-                                  asp-action="Index">
-                                <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                    <input type="file" name="file" class="form-control" />
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-2 d-flex align-items-center justify-content-center">
-                            <input type="submit"
-                                   form="uploadBaselineForm"
-                                   value="Upload File"
-                                   class="btn btn-primary" />
-                        </div>
-                    </div>
-                </div>
                 <div>
                     <div class="container cont-2">
                         <div class="row">
@@ -126,7 +93,7 @@
                                            type="checkbox"
                                            id="passive" />
                                     <label class="form-check-label" for="passive">
-                                        Passive
+                                        Shimmer
                                     </label>
                                 </div>
                             </div>
@@ -152,40 +119,7 @@
                     </div>
                 </div>
 
-                <div>
-                    <div class="container cont-2">
-                        <div class="row">
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           id="active" />
-                                    <label class="form-check-label" for="active">
-                                        Active
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-4 d-flex align-items-center justify-content-center">
-                                <form method="post"
-                                      id="uploadActiveForm"
-                                      enctype="multipart/form-data"
-                                      asp-controller="GSR"
-                                      asp-action="Index">
-                                    <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                        <input type="file" name="file" class="form-control" />
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <input type="submit"
-                                       form="uploadActiveForm"
-                                       value="Upload File"
-                                       class="btn btn-primary" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -236,6 +170,11 @@
     </div>
 </div>
 -->
+
+@if (TempData["message"] != null)
+{
+    <script>alert('@TempData["message"]');</script>    
+}
 
 <body>
     <div id="chart-container"></div>
