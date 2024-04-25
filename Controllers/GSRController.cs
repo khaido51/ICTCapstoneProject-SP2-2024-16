@@ -27,28 +27,6 @@ namespace ICTCapstoneProject.Controllers
         }
 
 
-
-        /*
-        [HttpPost]
-        public IActionResult Index(IFormFile file, [FromServices] IWebHostEnvironment hostingEnvironment)
-        {
-            #region Upload CSV
-            string fileName = $"{hostingEnvironment.WebRootPath}\\files\\{file.FileName}";
-            using (FileStream fileStream = System.IO.File.Create(fileName))
-            {
-                file.CopyTo(fileStream);
-                fileStream.Flush();
-            }
-            #endregion
-
-            var gsrReport = this.GetGsrReportList(fileName);
-
-
-            return Index(gsrReport);
-        }
-        */
-
-
         [HttpPost]
         public IActionResult Index(IFormFile file)
         {
@@ -101,8 +79,9 @@ namespace ICTCapstoneProject.Controllers
             using (var reader = new StreamReader(filePath))
             using (var csv = new CsvReader(reader, config))
             {
-
                 csv.Read();
+                csv.Read();
+                csv.Read();       
                 csv.ReadHeader();
                 string header = csv.HeaderRecord[0];
                 string msModel = nameof(GSR.ms);
@@ -128,7 +107,8 @@ namespace ICTCapstoneProject.Controllers
             using (var reader = new StreamReader(filePath))
             using (var csv = new CsvReader(reader, config))
             {
-                
+                csv.Read();
+                csv.Read();
                 csv.Read();
                 csv.ReadHeader();
                 string test = csv.HeaderRecord[0];

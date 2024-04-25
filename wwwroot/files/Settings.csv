@@ -1,2 +1,0 @@
-Timestamp,Segment,Participant ID,Scene,Self-report Interval (sec),Self-report Color Enabled,Self-report Category Enabled,Gaze Is Active,Gaze Interval (sec),Gaze Length (cm),Gaze Angle (deg),Gaze Distance (cm),Gaze Distance Random,Termination Method,Termination Turns,Termination Time (sec),Application Framerate,Physics Framerate,Min Speed (m/s),Max Speed (m/s),Min Acceleration (m/s),Max Acceleration (m/s),Shooting Enabled,Brightness Enabled
-2024-04-10 10:38:53.149,0,3,Baseline,60,True,True,False,,,,,,Time,,3,90,90,5,20,-2,2,False,False

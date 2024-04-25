@@ -2,6 +2,8 @@
 using CsvHelper.Configuration;
 using ICTCapstoneProject.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace ICTCapstoneProject.Controllers
@@ -24,22 +26,55 @@ namespace ICTCapstoneProject.Controllers
 
             return View(selfReports);
         }
+       
         /*
         [HttpPost]
-        public IActionResult Index(IFormFile file, [FromServices] IWebHostEnvironment hostingEnvironment)
+        public IActionResult Index(List<IFormFile> file)
+        {
+            List<SelfReport> selfReport = new List<SelfReport>();
+            int count = 0;
+            foreach (var fileItem in file)
+            {
+                string permittedExtension = ".csv";
+                var extension = Path.GetExtension(fileItem.FileName);
+                //Get the file name
+                var fileName = Path.GetFileNameWithoutExtension(fileItem.FileName);
+                //Get the Path and store the fileName under files folder 
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
+                if (extension != permittedExtension)
+                {
+                    TempData["Message"] = "Please Upload Only .csv file permitted";
+                    return RedirectToAction("Index");
+                }
+
+                else
+                {   
+                    if(fileName == fileItem.FileName)
+                    {
+                        count++;
+                        fileName = fileName + count + extension;
+                        using (var stream = System.IO.File.Create(filePath))
+                        {
+                            fileItem.CopyTo(stream);
+
+                        }
+
+                        //selfReport = this.GetListOfSelfReport(file);
+                    }
+                   
+                   
+                }
+            }
+            return View(selfReport);
+        }
+        */
+        /*
+        private List<SelfReport> GetListOfSelfReport(List<IFormFile> file)
         {
 
-            #region Upload CSV
-            string fileName = $"{hostingEnvironment.WebRootPath}\\files\\{file.FileName}";
-            using (FileStream fileStream = System.IO.File.Create(fileName))
-            {
-                file.CopyTo(fileStream);
-                fileStream.Flush();
-            }
-            #endregion
+            //Dictionary<int, List<SelfReport>> selfReportDictionary = new Dictionary<int, List<SelfReport>>();
 
-            var selfReports = this.GetSelfReportList(fileName);
-            return Index(selfReports);
+            throw new NotImplementedException();
         }
         */
 
@@ -82,7 +117,7 @@ namespace ICTCapstoneProject.Controllers
             }
 
         }
-
+        
         private string validateFile(string fileName)
         {
             string error = "";
@@ -125,13 +160,16 @@ namespace ICTCapstoneProject.Controllers
             using (var reader = new StreamReader(filePath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                csv.Read();
-                csv.ReadHeader();
-                while (csv.Read())
-                {
-                    var report = csv.GetRecord<SelfReport>();
-                    selfReports.Add(report);
-                }
+             
+                    csv.Read();
+                    csv.ReadHeader();
+                    while (csv.Read())
+                    {
+                        var report = csv.GetRecord<SelfReport>();
+                        selfReports.Add(report);
+                    }
+                
+               
             }
             #endregion
             return selfReports;

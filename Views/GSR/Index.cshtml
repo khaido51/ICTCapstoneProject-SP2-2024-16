@@ -209,7 +209,7 @@
 
         // Dataset conversion
         var gsrReport = @Html.Raw(Json.Serialize(Model));
-    console.log(gsrReport);
+        console.log(gsrReport);
 
         gsrReport.forEach(function (d) {
             d.tSpan = new Date(d.tSpan); // Convert to Date object
@@ -219,10 +219,67 @@
             d.mV = parseFloat(d.mV);
         });
 
+        /*
+        function calculateXDomain(gsrReport) {
+            const minTspan = d3.min(gsrReport, d => d.tSpan);
+            const maxTspan = d3.max(gsrReport, d => d.tSpan);
+            // Convert milliseconds to minutes
+            const tSpanRange = (maxTspan - minTspan) / (60 * 1000);
+            console.log(tSpanRange);
+            return [0, tSpanRange];
+        }
+
+        // Calculate the x domain
+        const xDomain = calculateXDomain(gsrReport);
+
+        // Set the x domain
+        x.domain(xDomain);
+        y.domain([0, d3.max(gsrReport, s => s.uS)]);
+
+        // Update the x-axis scale accordingly
+        svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x)
+                .ticks(11)// Set the number of ticks to match the range of tSpan values
+                .tickFormat((d, i) => {
+                    if (i === 0) return "0";
+                    const hour = i;
+                    const paddedHour = hour.toString().padStart(2, "0");
+                    return `${paddedHour}:00`;
+                }));
+
+        // Ensure the x-axis ticks start from 0
+        svg.select(".x-axis")
+            .selectAll(".tick")
+            .each(function (d, i) {
+                if (i === 0) {
+                    d3.select(this).remove(); // Remove the first tick if it's not at 0
+                }
+            });
+
+        
+        // Add the y-axis
+        svg.append("g")
+            .attr("class", "y-axis")
+            .call(d3.axisLeft(y));
+
+        // Log the x and y domains to verify their values
+        console.log("x domain:", x.domain());
+        console.log("y domain:", y.domain());
+
+        // Create the line generator
+        const msLine = d3.line()
+            .x((d, i) => x(i)) // Use the index 'i' as x-coordinate
+            .y(s => y(s.uS));
+        */
+
         // Define the x and y domains
         x.domain(d3.extent(gsrReport, s => s.tSpan));
         y.domain([0, d3.max(gsrReport, s => s.uS)]);
 
+        console.log("x domain:", x.domain());
+        console.log("y domain:", y.domain());
         // Add the x-axis
         svg.append("g")
             .attr("class", "x-axis")
@@ -240,7 +297,8 @@
         const msLine = d3.line()
             .x(s => x(s.tSpan))
             .y(s => y(s.uS));
-
+        // Log the line data to see if it's correctly generated
+        console.log("Line data:", gsrReport.map((d, i) => [i, d.uS]));
         // Add the line to the SVG
         svg.append("path")
             .datum(gsrReport)
@@ -302,5 +360,7 @@
             .attr('transform', 'translate(90,30)');
 
         gRange.call(sliderRange);
+
+       
 </script>
 </body>
