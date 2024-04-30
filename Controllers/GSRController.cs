@@ -70,7 +70,7 @@ namespace ICTCapstoneProject.Controllers
         private string validateFile(string fileName)
         {
             string error = "";
-            List<GSR> gsrReport = new List<GSR>();
+       
 
             //var config = CsvConfiguration.FromAttributes<GSR>();
             #region Read CSV
@@ -92,14 +92,15 @@ namespace ICTCapstoneProject.Controllers
             }
             #endregion
          
-
+            
             return error;
         }
 
         private List<GSR> GetGsrReportList(string fileName)
         {
             List<GSR> gsrReport = new List<GSR>();
-
+            double countSample = 32130;
+            double value = 0;
             //var config = CsvConfiguration.FromAttributes<GSR>();
             #region Read CSV
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
@@ -112,6 +113,7 @@ namespace ICTCapstoneProject.Controllers
                 csv.Read();
                 csv.ReadHeader();
                 string test = csv.HeaderRecord[0];
+               
                 while (csv.Read())
                 {
                    
@@ -119,13 +121,13 @@ namespace ICTCapstoneProject.Controllers
                     //string header = csv.HeaderRecord.ToString();
                     gsr.test = double.Parse(gsr.ms);
                     gsr.tSpan = TimeSpan.FromMilliseconds(gsr.test);
+                    //gsr.xValue = gsr.xValue + (1 / 51.2);
+                    gsr.xValue = value;
+                    gsr.xValueTspan = TimeSpan.FromMinutes(gsr.xValue);                  
                     gsr.totalSeconds = gsr.tSpan.TotalMilliseconds;
-                    gsr.millisecs = gsr.totalSeconds.ToString();
-                    //gsr.totalSeconds = gsr.tSpan.TotalMinutes;
-                    
-                    //double.Parse("1.50E-15", CultureInfo.InvariantCulture)
-                    //gsr.ms = Convert.ToDecimal(csv.GetField("ms"), CultureInfo.InvariantCulture);
+                    gsr.millisecs = gsr.totalSeconds.ToString();          
                     gsrReport.Add(gsr);
+                    value += (1 / 51.2);
                 }
             }
             #endregion

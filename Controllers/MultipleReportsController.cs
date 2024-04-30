@@ -15,6 +15,7 @@ namespace ICTCapstoneProject.Controllers
         [HttpPost]
         public IActionResult Index(List<IFormFile> files)
         {
+
             //List<SelfReport> selfReports = new List<SelfReport>();
             Dictionary<int, List<SelfReport>> selfReportsDic= new Dictionary<int, List<SelfReport>>();
             List<string> listOfFileNames = new List<string>();
@@ -27,18 +28,48 @@ namespace ICTCapstoneProject.Controllers
                 {
                     file.CopyTo(stream);    
                 }
-                
-               
-                listOfFileNames.Add(fileName);
-               
-                
 
+           
+
+                var error = this.validateFiles(listOfFileNames);
+                if (!string.IsNullOrEmpty(error))
+                {
+                    TempData["Message"] = error;
+                    System.IO.File.Delete(filePath);
+                    return RedirectToAction("Index");
+                }
+
+                listOfFileNames.Add(fileName);
             }
+          
+
             selfReportsDic = this.GetListOfSelfReport(listOfFileNames);
             return Index(new MultipleReports() { selfReportsDictionary = selfReportsDic });
         }
 
-       
+        private string validateFiles(List<string> listOfFileNames)
+        {
+            string error = "";
+            foreach(var file in listOfFileNames)
+            {
+                #region readCSV
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", file);
+                using (var reader = new StreamReader(filePath))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    csv.Read();
+                    csv.ReadHeader();
+                    string header = csv.HeaderRecord[3];
+                    string selfReportModel = nameof(SelfReport.selfReport);
+                    if(header != selfReportModel)
+                    {
+                        error = "Header is not matched, Please upload correct CSV file";
+                    }
+                }
+                #endregion
+            }
+            return error;
+        }
 
         private  Dictionary<int, List<SelfReport>> GetListOfSelfReport(List<string> listOfFileNames)
         {

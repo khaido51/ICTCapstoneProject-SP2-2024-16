@@ -29,6 +29,13 @@ namespace ICTCapstoneProject.Models
 
         [Ignore]
         public string millisecs { get; set; }
+
+        [Ignore]
+        public double xValue { get; set; }
+
+
+        [Ignore]
+        public TimeSpan xValueTspan { get; set; }
     }
 
 

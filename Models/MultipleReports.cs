@@ -7,3 +7,4 @@ namespace ICTCapstoneProject.Models
       public Dictionary<int, List<SelfReport>> selfReportsDictionary { get; set; }    
     }
 }
+
