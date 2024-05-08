@@ -37,8 +37,6 @@ namespace ICTCapstoneProject.Models
         [Ignore]
         public TimeSpan xValueTspan { get; set; }
 
-        [Ignore]
-        public TimeSpan xTime { get; set; }
     }
 
 

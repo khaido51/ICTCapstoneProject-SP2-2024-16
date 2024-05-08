@@ -192,8 +192,8 @@
     </style>
 <script>
         //Set dimensions and margins for the chart
-        
-        const margin = { top: 70, right: 30, bottom: 40, left: 80 };
+
+        const margin = { top: 70, right: 60, bottom: 40, left: 80 };
         const width = 1200 - margin.left - margin.right;
         const height = 500 - margin.top - margin.bottom;
 
@@ -223,10 +223,8 @@
 
             //Create current Date value to assign Minutes and Seconds
             const dayTest = new Date();
-          
             const timeString = d.xValueTspan;
             const parts = timeString.split(":");
-            
             const minutes = parseInt(parts[1], 10);
             const seconds = parseInt(parts[2]);
 
@@ -235,21 +233,20 @@
             
             //console.log(dayTest.toString("YYYY-MM-DD HH:mm:ss fff"));
             d.xValueTspan = dayTest;
-            //console.log(timeString);
-            
-            //d.xTime = { minutes, seconds };
+
         });
 
-       
+        // Initialize horizontal and vertical ranges
+        let horizontalRange = d3.extent(gsrReport, s => s.xValueTspan);
+        let verticalRange = [0, d3.max(gsrReport, s => s.uS)];
+
         // Define the x and y domains
-        x.domain(d3.extent(gsrReport, s => s.xValueTspan));
-        //x.domain([0, 10 * 60])
-        y.domain([0, d3.max(gsrReport, s => s.uS)]);
+        x.domain(horizontalRange);
+        y.domain(verticalRange);
 
         console.log("x domain:", x.domain());
         console.log("y domain:", y.domain());
 
-        
         // Add the x-axis
         svg.append("g")
             .attr("class", "x-axis")
@@ -257,24 +254,18 @@
             .call(d3.axisBottom(x)
                 .ticks(d3.timeMinute.every(1))
                 .tickFormat(d3.timeFormat("%M:%S")));
-   
+
         // Add the y-axis
         svg.append("g")
             .attr("class", "y-axis")
             .call(d3.axisLeft(y));
 
-   
-            
         // Create the line generator
         const msLine = d3.line()
             .x(s => x(s.xValueTspan))
             .y(s => y(s.uS));
 
-            
-        // Log the line data to see if it's correctly generated
-        console.log("Line data:", gsrReport.map((d, i) => [i, d.uS]));
-        
-        // Add the line to the SVG  
+        // Add the line to the SVG
         svg.append("path")
             .datum(gsrReport)
             .attr("class", "line")
@@ -282,40 +273,50 @@
             .attr("stroke", "steelblue")
             .attr("stroke-width", 3)
             .attr("d", msLine);
-      
+
         // Slider configuration
-        const horizontalSlider = d3
-            .sliderBottom()
+        const horizontalSlider = d3.sliderBottom()
             .min(d3.min(gsrReport, d => d.xValueTspan))
             .max(d3.max(gsrReport, d => d.xValueTspan))
-            .width(300)
+            .width(400)
             .tickFormat(d3.timeFormat("%M:%S"))
             .ticks(3)
-            .default([d3.min(gsrReport, d => d.xValueTspan), d3.max(gsrReport, d => d.xValueTspan)])
+            .default(horizontalRange)
             .fill('#85bb65');
 
-        horizontalSlider.on('onchange', val => {
-            // Update x domain based on slider value
-            x.domain(val);
+        const verticalSlider = d3.sliderLeft()
+            .min(0)
+            .max(d3.max(gsrReport, d => d.uS))
+            .height(250)
+            .ticks(5)
+            .default(verticalRange)
+            .fill('#85bb65');
 
-            // Filter data based on slider value
-            const filteredData = gsrReport.filter(d => d.xValueTspan >= val[0] && d.xValueTspan <= val[1]);
+        // Update function to redraw the graph
+        function updateGraph() {
+            //filtering data between min and max value range from user's input for both xaxis and yaxis
+            const filteredData = gsrReport.filter(d => 
+                    d.xValueTspan >= horizontalRange[0] && d.xValueTspan <= horizontalRange[1]
+                    && d.uS >= verticalRange[0] && d.uS <= verticalRange[1]
+            );
 
-            // Update the line generator function
+            //Update the x and y domain with latest range
+            x.domain(horizontalRange);
+            y.domain(verticalRange);
+
+
+            // Update the line generator function based on new x and y domain
             const line = d3.line()
                 .x(d => x(d.xValueTspan))
                 .y(d => y(d.uS));
 
-            // Update y domain based on filtered data
-            y.domain([0, d3.max(filteredData, d => d.uS)]);
-
-            // Update the x-axis
+            //Update value on xAxis for new range
             svg.select(".x-axis")
                 .call(d3.axisBottom(x)
                     .ticks(d3.timeMinute.every(1))
                     .tickFormat(d3.timeFormat("%M:%S")));
 
-            // Update the y-axis
+            //Update value on yAxis for new range
             svg.select(".y-axis")
                 .call(d3.axisLeft(y));
 
@@ -323,106 +324,39 @@
             svg.select(".line")
                 .datum(filteredData)
                 .attr("d", line);
-        });
-        
-        /*
-        const verticalSlider = d3
-            .sliderVertical()
-            .min(d3.min(gsrReport, d => d.uS))
-            .max(d3.max(gsrReport, d => d.uS))
-            .width(20)
-            .height(300)
-            .default([d3.min(gsrReport, d => d.uS), d3.max(gsrReport, d => d.uS)])
-            .fill('#85bb65');
-            
-        function updateChart(val, orientation) {
-            if (orientation == "horizontal") {
-                x.domain(val);
-            }
-            else if( orientation == "vertical"){
-                y.domain(val);
-            }
-           
-            const filteredData = gsrReport.filter(d => {
-                if (orientation == "horizontal") {
-                    return d => d.xValueTspan >= val[0] && d.xValueTspan <= val[1];
-                }
-                else if (orientation == "vertical") {
-                    return d => d.uS >= val[0] && d.uS <= val[1];
-                }
-            });
-            
-
-            
-
-            // Update y domain based on filtered data
-            if (orientation == "horizontal") {
-                y.domain([0, d3.max(filteredData, d => d.uS)]);
-            }
-           
-            if (orientation == "vertical") {
-                //Update x domain based on filtered data
-                x.domain(d3.extent(filteredData, s => s.xValueTspan));
-            }
-          
-            if(orientation == "horizontal"){
-                // Update the x-axis
-                svg.select(".x-axis")
-                    .call(d3.axisBottom(x)
-                        .ticks(d3.timeMinute.every(1))
-                        .tickFormat(d3.timeFormat("%M:%S")));
-            }
-            
-            if(orientation == "vertical"){
-                // Update the y-axis
-                svg.select(".y-axis")
-                    .call(d3.axisLeft(y));
-            }
-           
-            const line = d3.line()
-                .x(d => x(d.xValueTspan))
-                .y(d => y(d.uS));
-
-            // Update the line
-            svg.select(".line")
-                .datum(filteredData)
-                .attr("d", line);
         }
 
-        sliderRange.on('onchange', val => {
-            // Update x domain based on slider value
-            updateChart(val, "horizontal");
-  
+        // Horizontal slider onchange
+        horizontalSlider.on('onchange', val => {
+            horizontalRange = val;
+            updateGraph();
         });
 
+        // Vertical slider onchange
         verticalSlider.on('onchange', val => {
-            updateChart(val, "vertical");
-       
+            verticalRange = val;
+            updateGraph();
         });
-        */
-        // Append the slider to the container
-        const horizontalRange = d3
-            .select('#slider-range')
-            .append('svg')
-            .attr('width', 500)
-            .attr('height', 100)
-            .append('g')
-            .attr('transform', 'translate(90,30)');
 
-        horizontalRange.call(horizontalSlider);
-        /*
-        const verticalRange = d3
-            .select('#vertical-slider')
-            .append('svg')
-            .attr('width', 100)
-            .attr('height', 500)
-            .append('g')
-            .attr('transform', 'translate(90,30)');
-     
+        // Append horizontal slider
+        d3.select("#slider-range")
+            .append("svg")
+            .attr("width", 500)
+            .attr("height", 100)
+            .append("g")
+            .attr("transform", "translate(90,30)")
+            .call(horizontalSlider);
 
-        verticalRange.call(verticalSlider);
+        // Append vertical slider
+        d3.select("#vertical-slider")
+            .append("svg")
+            .attr("width", 100)
+            .attr("height", 300)
+            .append("g")
+            .attr("transform", `translate(${margin.left + width + 20}, 10)`)
+            .call(verticalSlider);
 
-        */
+       
         
 </script>
 </body>
