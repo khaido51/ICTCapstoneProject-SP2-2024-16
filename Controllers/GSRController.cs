@@ -123,7 +123,7 @@ namespace ICTCapstoneProject.Controllers
                     gsr.tSpan = TimeSpan.FromMilliseconds(gsr.test);
                     //gsr.xValue = gsr.xValue + (1 / 51.2);
                     gsr.xValue = value;
-                    gsr.xValueTspan = TimeSpan.FromMinutes(gsr.xValue);                  
+                    gsr.xValueTspan = TimeSpan.FromSeconds(gsr.xValue);                  
                     gsr.totalSeconds = gsr.tSpan.TotalMilliseconds;
                     gsr.millisecs = gsr.totalSeconds.ToString();          
                     gsrReport.Add(gsr);
