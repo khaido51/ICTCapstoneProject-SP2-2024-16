@@ -1,4 +1,5 @@
-﻿@model MultipleReports
+﻿@using System.Text.Json;
+@model MultipleReports
 @{
     ViewData["Title"] = "Detecting of Onset Of Cysbersicknees using Physiological Cues";
     ViewData["Title2"] = "Multiple Self-Report";
@@ -21,6 +22,17 @@
                   margin-right: 5rem;
                   margin-left: 5rem;
                 } */
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    /* setting the text-align property to center*/
+    td {
+        padding: 5px;
+        text-align: center;
+    }
     .name-1 {
         width: fit-content;
         padding: 1rem 2rem 0.5rem 2rem;
@@ -73,7 +85,8 @@
                             <div class="form-check">
                                 <input class="form-check-input"
                                        type="checkbox"
-                                       id="baseline" />
+                                       id="baseline" 
+                                       onclick="isChecked(this)"/>
                                 <label class="form-check-label" for="baseline">
                                     Baseline
                                 </label>
@@ -87,7 +100,7 @@
                                   asp-controller="MultipleReports"
                                   asp-action="Index">
                                 <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                    <input type="file" multiple="multiple" name="files" class="form-control" required />
+                                    <input id="uploadFile" type="file" name="files" class="form-control" multiple required/>
                                 </div>
                             </form>
                         </div>
@@ -104,11 +117,13 @@
                 <div>
                     <div class="container cont-2">
                         <div class="row">
+
                             <div class="col-2 d-flex align-items-center justify-content-center">
                                 <div class="form-check">
                                     <input class="form-check-input"
                                            type="checkbox"
-                                           id="passive" />
+                                           id="passive" 
+                                           onclick="isChecked(this)" />
                                     <label class="form-check-label" for="passive">
                                         Passive
                                     </label>
@@ -143,7 +158,8 @@
                                 <div class="form-check">
                                     <input class="form-check-input"
                                            type="checkbox"
-                                           id="active" />
+                                           id="active" 
+                                           onclick="isChecked(this)" />
                                     <label class="form-check-label" for="active">
                                         Active
                                     </label>
@@ -178,26 +194,14 @@
     <div class="row gx-4 justify-content-center">
         <div class="col-lg-10">
    
-            @if(Model.selfReportsDictionary != null && Model.selfReportsDictionary.Count > 0)
+            @if (Model.selfReportsDictionary != null && Model.selfReportsDictionary.Count > 0)
             {
                 @foreach (var selfReportDic in Model.selfReportsDictionary)
                 {
                     <hr />
                     <h3>Table for Key: @selfReportDic.Key</h3>
                     <table cellpadding="0" cellspacing="0" border="1">
-                        <style>
-                            table,
-                            th,
-                            td {
-                                border: 1px solid black;
-                                border-collapse: collapse;
-                            }
-                            /* setting the text-align property to center*/
-                            td {
-                                padding: 5px;
-                                text-align: center;
-                            }
-                        </style>
+                       
                         <tr>
                             <td>TimeStamp</td>
                             <td>Segment</td>
@@ -225,3 +229,127 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Get the file input element
+    const fileInput = document.getElementById('uploadFile');
+
+    // Add an event listener to handle file selection
+    fileInput.addEventListener('change', handleFileSelect);
+
+    function handleFileSelect(event) {
+        // Get the selected files
+        const files = event.target.files;
+
+        // Iterate over each selected file
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            // Here, you can perform any processing or validation on the file
+            // For example, you can upload the file using AJAX
+
+            // Display a message for each selected file
+            console.log(`Selected file: ${file.name}`);
+        }
+    }
+</script>
+
+<script>
+  
+    
+</script>
+
+<body>
+    <div id="graph-container">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+      
+            var selfReportsDictionaryJson = @Html.Raw(Json.Serialize(Model.selfReportsDictionary));
+            console.log(selfReportsDictionaryJson);
+
+            var selfReportsArray = [];
+            for (var key in selfReportsDictionaryJson) {
+                if (selfReportsDictionaryJson.hasOwnProperty(key)) {
+                    var item = {
+                        key: key,
+                        value: selfReportsDictionaryJson[key]
+                    };
+                    selfReportsArray.push(item);
+                }
+            }
+
+            // Now you can iterate over the array
+            selfReportsArray.forEach((item) => {
+                console.log("Key: ", item.key);
+                console.log("Value: ", item.value);
+               
+                const margin = { top: 70, right: 30, bottom: 40, left: 80 };
+                const width = 1200 - margin.right - margin.left;
+                const height = 500 - margin.top - margin.bottom;
+
+                //set up the x and y scales
+                const x = d3.scaleTime()
+                    .range([0, width]);
+                const y = d3.scaleLinear()
+                    .range([height, 0]);
+
+                const svg = d3.select('#graph-container')
+                    .append("svg")
+                    .attr('width', width + margin.right + margin.left)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+                item.value.forEach(function (d) {
+                    d.timeStamp = new Date(d.timeStamp); 
+                    d.segment = +d.segment; // 
+                    d.selfReport = +d.selfReport;
+                });
+               
+                // Define the x and y domains
+                x.domain(d3.extent(item.value, s => s.timeStamp));
+                y.domain([0, d3.max(item.value, s => s.selfReport)]);
+                console.log(x, y);
+
+
+                // y.domain([0, d3.max(selfReports, s => s.selfReport)]);
+
+                // Add the x-axis
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x)
+                        .tickFormat(d3.timeFormat("%I:%M:%S %p")));
+
+                //Add the y-axis
+                svg.append("g")
+                    .call(d3.axisLeft(y))
+
+                
+
+                const lineSelfReport = d3.line()
+                    .x(s => x(s.timeStamp))
+                    .y(s => y(s.selfReport));
+
+              
+
+                //Add the lineSegment to the SVG element
+                svg.append("path")
+                    .datum(item.value)
+                    .attr("fill", "none")
+                    .attr("stroke", "red")
+                    .attr("stroke-width", 3)
+                    .attr("d", lineSelfReport);
+
+            });
+        
+       
+
+      
+        
+    </script>
+       
+    </div>
+
+</body>

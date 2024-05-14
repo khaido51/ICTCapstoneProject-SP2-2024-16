@@ -30,7 +30,7 @@ namespace ICTCapstoneProject.Controllers
                 }
 
            
-
+                /*
                 var error = this.validateFiles(listOfFileNames);
                 if (!string.IsNullOrEmpty(error))
                 {
@@ -38,7 +38,7 @@ namespace ICTCapstoneProject.Controllers
                     System.IO.File.Delete(filePath);
                     return RedirectToAction("Index");
                 }
-
+                */
                 listOfFileNames.Add(fileName);
             }
           
@@ -46,7 +46,7 @@ namespace ICTCapstoneProject.Controllers
             selfReportsDic = this.GetListOfSelfReport(listOfFileNames);
             return Index(new MultipleReports() { selfReportsDictionary = selfReportsDic });
         }
-
+        /*
         private string validateFiles(List<string> listOfFileNames)
         {
             string error = "";
@@ -70,6 +70,7 @@ namespace ICTCapstoneProject.Controllers
             }
             return error;
         }
+        */
 
         private  Dictionary<int, List<SelfReport>> GetListOfSelfReport(List<string> listOfFileNames)
         {
