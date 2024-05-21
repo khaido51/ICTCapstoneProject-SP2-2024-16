@@ -209,6 +209,7 @@
                         </tr>
                         @foreach (var selfReport in @selfReportDic.Value)
                         {
+                            
                             <tr>
                                 <td>@selfReport.timeStamp</td>
                                 <td>@selfReport.segment</td>
@@ -223,7 +224,41 @@
                 
                 <p class="overflow-hidden">No Data</p>
             }
-                
+            
+            <h2>Average Table</h2>
+            @if (Model.averageSelfReport != null && Model.averageSelfReport.Count > 0)
+            {
+                <hr />
+                <table cellpadding="0" cellspacing="0" border="1">
+                    <style>
+                        table,
+                        th,
+                        td {
+                            border: 1px solid black;
+                            border-collapse: collapse;
+                        }
+                        /* setting the text-align property to center*/
+                        td {
+                            padding: 5px;
+                            text-align: center;
+                        }
+                    </style>
+                    <tr>
+                        <td>TimeStamp</td>
+                        <td>Segment</td>
+                        <td>SelfReport</td>
+                    </tr>
+                    @foreach (SelfReport selfReport in Model.averageSelfReport)
+                    {
+                        <tr>
+                            <td>@selfReport.timeStamp</td>
+                            <td>@selfReport.segment</td>
+                            <td>@selfReport.selfReport</td>
+                        </tr>
+                    }
+                </table>
+            }
+           
               
             
         </div>
@@ -264,7 +299,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <script>
-      
+           
             var selfReportsDictionaryJson = @Html.Raw(Json.Serialize(Model.selfReportsDictionary));
             console.log(selfReportsDictionaryJson);
 
@@ -302,13 +337,16 @@
                     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
                 item.value.forEach(function (d) {
-                    d.timeStamp = new Date(d.timeStamp); 
-                    d.segment = +d.segment; // 
+                    d.timeStamp = new Date(d.timeStamp);        
+                    d.segment = +d.segment; //                  
                     d.selfReport = +d.selfReport;
+                    
                 });
                
+               
+
                 // Define the x and y domains
-                x.domain(d3.extent(item.value, s => s.timeStamp));
+                x.domain(d3.extent(item.value, s => s.segment));
                 y.domain([0, d3.max(item.value, s => s.selfReport)]);
                 console.log(x, y);
 
@@ -320,7 +358,8 @@
                 svg.append("g")
                     .attr("transform", `translate(0,${height})`)
                     .call(d3.axisBottom(x)
-                        .tickFormat(d3.timeFormat("%I:%M:%S %p")));
+                    .ticks(10)
+                    .tickFormat(d3.format("d")));
 
                 //Add the y-axis
                 svg.append("g")
@@ -329,7 +368,7 @@
                 
 
                 const lineSelfReport = d3.line()
-                    .x(s => x(s.timeStamp))
+                    .x(s => x(s.segment))
                     .y(s => y(s.selfReport));
 
               
@@ -343,8 +382,69 @@
                     .attr("d", lineSelfReport);
 
             });
-        
-       
+
+            const margin = { top: 70, right: 30, bottom: 40, left: 80 };
+            const width = 1200 - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
+
+            //set up the x and y scales
+            const x = d3.scaleTime()
+                .range([0, width]);
+            const y = d3.scaleLinear()
+                .range([height, 0]);
+
+            //create the SVG element and append it to the chart container
+            const svg = d3.select("#graph-container")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+            //create a dump dataset
+            var selfReports = @Html.Raw(Json.Serialize(Model.averageSelfReport));
+            console.log(selfReports);
+
+            /*
+            selfReports.forEach(function (d) {
+                d.timeStamp = new Date(d.timeStamp); // Assuming TimeStamp is a date string
+                d.segment = +d.segment; // Convert to number using unary operator
+                d.selfReport = +d.selfReport; // Convert to number using unary operator
+            });
+            */
+            // Define the x and y domains
+
+            x.domain(d3.extent(selfReports, s => s.segment));
+            y.domain([0, d3.max(selfReports, s => s.selfReport)]);
+
+            // y.domain([0, d3.max(selfReports, s => s.selfReport)]);
+
+            // Add the x-axis
+
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x)
+                 .ticks(10)
+                 .tickFormat(d3.format("d")));
+
+            //Add the y-axis
+            svg.append("g")
+                .call(d3.axisLeft(y))
+
+            //Create the line generator
+         
+            const lineSelfReport = d3.line()
+                .x(s => x(s.segment))
+                .y(s => y(s.selfReport));
+
+            //Add the lineSegment to the SVG element
+            svg.append("path")
+                .datum(selfReports)
+                .attr("fill", "none")
+                .attr("stroke", "red")
+                .attr("stroke-width", 3)
+                .attr("d", lineSelfReport);
 
       
         

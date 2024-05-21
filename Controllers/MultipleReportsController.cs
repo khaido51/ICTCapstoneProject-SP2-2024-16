@@ -18,6 +18,7 @@ namespace ICTCapstoneProject.Controllers
 
             //List<SelfReport> selfReports = new List<SelfReport>();
             Dictionary<int, List<SelfReport>> selfReportsDic= new Dictionary<int, List<SelfReport>>();
+            List<SelfReport> averageList = new List<SelfReport>();
             List<string> listOfFileNames = new List<string>();
             foreach (var file in files)
             {
@@ -44,7 +45,9 @@ namespace ICTCapstoneProject.Controllers
           
 
             selfReportsDic = this.GetListOfSelfReport(listOfFileNames);
-            return Index(new MultipleReports() { selfReportsDictionary = selfReportsDic });
+            averageList = this.CalculateAverageValue(selfReportsDic);
+            //assign selfReportsDictionary and averageSelfReport with value calculated above
+            return Index(new MultipleReports() { selfReportsDictionary = selfReportsDic, averageSelfReport = averageList }) ;
         }
         /*
         private string validateFiles(List<string> listOfFileNames)
@@ -94,6 +97,7 @@ namespace ICTCapstoneProject.Controllers
                     {
                        
                         var report = csv.GetRecord<SelfReport>();
+                        
                         selfReports.Add(report);
                         
                     }
@@ -108,6 +112,56 @@ namespace ICTCapstoneProject.Controllers
             return selfReportsDictionary;
         }
 
-     
+
+        private List<SelfReport> CalculateAverageValue(Dictionary<int, List<SelfReport>> multipleSelfReportDictionary)
+        {
+            List<SelfReport> newList = new List<SelfReport>();
+            List<List<SelfReport>> listOfList = new List<List<SelfReport>>();
+
+
+            //Loop through the map to add List<SelfReport> to the listOfList
+            foreach (KeyValuePair<int, List<SelfReport>> kvp in multipleSelfReportDictionary)
+            {
+                listOfList.Add(kvp.Value);
+            }
+
+            //Initalize the size of every List<SelfReport> to have the same
+            //length with the first list in listOfList
+            int listSize = listOfList[0].Count;
+
+            //Calculate the average of corresponding elements in the list 
+            for (int i = 0; i < listSize; i++)
+            {
+                DateTime averageTimeStamp = DateTime.Today;
+                int totalSegment = 0;
+                double totalSelfReport = 0;
+
+                //loop each list in the listOfList to get the corresponding
+                //row index to add to total value
+                foreach (var list in listOfList)
+                {
+                    totalSegment += list[i].segment;
+                    totalSelfReport += list[i].selfReport;
+                }
+
+                //Calculate the average
+                int averageSegment = totalSegment / listOfList.Count;
+                double averageSelfReport = totalSelfReport / listOfList.Count;
+
+                //Create SelfReport objects to add to the list
+                SelfReport average = new SelfReport
+                {
+                    timeStamp = averageTimeStamp,
+                    segment = averageSegment,
+                    selfReport = averageSelfReport
+
+                };
+                newList.Add(average);
+            }
+           
+
+            //return it to index page
+            return newList;
+        }
     }
 }
