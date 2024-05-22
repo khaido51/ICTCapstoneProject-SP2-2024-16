@@ -99,7 +99,7 @@ namespace ICTCapstoneProject.Controllers
         private List<GSR> GetGsrReportList(string fileName)
         {
             List<GSR> gsrReport = new List<GSR>();
-            double countSample = 32130;
+            //double countSample = 32130;
             double value = 0;
             //var config = CsvConfiguration.FromAttributes<GSR>();
             #region Read CSV

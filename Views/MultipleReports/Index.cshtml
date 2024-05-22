@@ -79,17 +79,22 @@
         <div class="row gx-4 justify-content-center">
             <div class="col-lg-8">
                 <div class="scene-name"><p>Scene</p></div>
+
+                <!-- Baseline-->
                 <div class="container cont-2">
-                    <div class="row">
+                    <div class="row radio-group">
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <div class="form-check">
                                 <input class="form-check-input"
-                                       type="checkbox"
-                                       id="baseline" 
-                                       onclick="isChecked(this)"/>
-                                <label class="form-check-label" for="baseline">
-                                    Baseline
-                                </label>
+                                       type="radio"
+                                       id="baseline"
+                                       value="baseline"
+                                       name="gsr-graph"
+                                       />
+
+								<label class="form-check-label" for="baseline">
+									Baseline
+								</label>
                             </div>
                         </div>
 
@@ -98,15 +103,15 @@
                                   id="uploadBaselineForm"
                                   enctype="multipart/form-data"
                                   asp-controller="MultipleReports"
-                                  asp-action="Index">
+                                  asp-action="Index" required>
                                 <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                    <input id="uploadFile" type="file" name="files" class="form-control" multiple required/>
+                                    <input id="uploadFileBaseline" type="file" name="files" class="form-control" multiple required />
                                 </div>
                             </form>
                         </div>
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <input type="submit"
-                                   id="submit"
+                                   id="submitBaseline"
                                    form="uploadBaselineForm"
                                    value="Upload File"
                                    class="btn btn-primary" />
@@ -114,16 +119,19 @@
                         </div>
                     </div>
                 </div>
+                <!-- Passive-->
                 <div>
                     <div class="container cont-2">
-                        <div class="row">
+                        <div class="row radio-group">
 
                             <div class="col-2 d-flex align-items-center justify-content-center">
                                 <div class="form-check">
                                     <input class="form-check-input"
-                                           type="checkbox"
-                                           id="passive" 
-                                           onclick="isChecked(this)" />
+                                           type="radio"
+                                           id="passive"
+                                           name="gsr-graph"
+                                           value="passive"/>
+                                           
                                     <label class="form-check-label" for="passive">
                                         Passive
                                     </label>
@@ -134,15 +142,16 @@
                                 <form method="post"
                                       id="uploadPassiveForm"
                                       enctype="multipart/form-data"
-                                      asp-controller="SelfReport"
-                                      asp-action="Index">
+                                      asp-controller="MultipleReports"
+                                      asp-action="Index" required>
                                     <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                        <input type="file" name="file" class="form-control" />
+                                        <input id="uploadFilePassive" type="file" name="files" class="form-control" multiple required />
                                     </div>
                                 </form>
                             </div>
                             <div class="col-2 d-flex align-items-center justify-content-center">
                                 <input type="submit"
+                                       id="submitPassive"
                                        form="uploadPassiveForm"
                                        value="Upload File"
                                        class="btn btn-primary" />
@@ -150,19 +159,22 @@
                         </div>
                     </div>
                 </div>
-
+                <!--Active -->
                 <div>
                     <div class="container cont-2">
-                        <div class="row">
+                        <div class="row radio-group">
                             <div class="col-2 d-flex align-items-center justify-content-center">
                                 <div class="form-check">
                                     <input class="form-check-input"
-                                           type="checkbox"
-                                           id="active" 
-                                           onclick="isChecked(this)" />
+                                           type="radio"
+                                           id="active"
+                                           name="gsr-graph"
+                                           value="active"/>
+                                          
                                     <label class="form-check-label" for="active">
                                         Active
                                     </label>
+
                                 </div>
                             </div>
 
@@ -170,15 +182,16 @@
                                 <form method="post"
                                       id="uploadActiveForm"
                                       enctype="multipart/form-data"
-                                      asp-controller="SelfReport"
-                                      asp-action="Index">
+                                      asp-controller="MultipleReports"
+                                      asp-action="Index" required>
                                     <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                        <input type="file" name="file" class="form-control" />
+                                        <input id="uploadFileActive" type="file" name="files" class="form-control" multiple required />
                                     </div>
                                 </form>
                             </div>
                             <div class="col-2 d-flex align-items-center justify-content-center">
                                 <input type="submit"
+                                       id="submitActive"
                                        form="uploadActiveForm"
                                        value="Upload File"
                                        class="btn btn-primary" />
@@ -189,6 +202,39 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('change', e => {
+            if (e.target.name === 'gsr-graph') {
+                const selectedValue = e.target.value;
+
+
+                // Enable the selected file input and submit button
+                if (selectedValue === 'baseline') {
+                    document.getElementById('uploadFileBaseline').disabled = false;
+                    document.getElementById('submitBaseline').disabled = false;
+                    document.getElementById('uploadFilePassive').disabled = true;
+                    document.getElementById('submitPassive').disabled = true;
+                    document.getElementById('uploadFileActive').disabled = true;
+                    document.getElementById('submitActive').disabled = true;
+                } else if (selectedValue === 'passive') {
+                    document.getElementById('uploadFilePassive').disabled = false;
+                    document.getElementById('submitPassive').disabled = false;
+                    document.getElementById('uploadFileBaseline').disabled = true;
+                    document.getElementById('submitBaseline').disabled = true;
+                    document.getElementById('uploadFileActive').disabled = true;
+                    document.getElementById('submitActive').disabled = true;
+                } else if (selectedValue === 'active') {
+                    document.getElementById('uploadFileBaseline').disabled = true;
+                    document.getElementById('submitBaseline').disabled = true;
+                    document.getElementById('uploadFilePassive').disabled = true;
+                    document.getElementById('submitPassive').disabled = true;
+                    document.getElementById('uploadFileActive').disabled = false;
+                    document.getElementById('submitActive').disabled = false;
+                }
+            }
+        });
+    </script>
 </section>
 <div class="container px-4">
     <div class="row gx-4 justify-content-center">
@@ -265,6 +311,11 @@
     </div>
 </div>
 
+@if (TempData["message"] != null)
+{
+    <script>alert('@TempData["message"]');</script>
+}
+
 <script>
     // Get the file input element
     const fileInput = document.getElementById('uploadFile');
@@ -289,10 +340,7 @@
     }
 </script>
 
-<script>
-  
-    
-</script>
+
 
 <body>
     <div id="graph-container">
@@ -449,7 +497,14 @@
       
         
     </script>
-       
+      
     </div>
+
+    <script>
+        function download() {
+            const imageLink = document.createElement('a');
+            const canvas = document.getElementById("graph-container");
+        }
+    </script>
 
 </body>

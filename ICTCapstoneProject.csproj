@@ -23,6 +23,7 @@
   <ItemGroup>
     <Folder Include="data\" />
     <Folder Include="Views\GSR\" />
+    <Folder Include="Views\MultipleReports\" />
     <Folder Include="wwwroot\files\" />
   </ItemGroup>
 

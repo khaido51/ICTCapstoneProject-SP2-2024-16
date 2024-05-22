@@ -256,7 +256,7 @@
 
         //set up the x and y scales
         const x = d3.scaleTime()
-            .range([0, width]);
+            .range([0, width]); // specify the max width available in graph space
         const y = d3.scaleLinear()
             .range([height, 0]);
 
@@ -273,15 +273,15 @@
         var selfReports = @Html.Raw(Json.Serialize(Model));
         console.log(selfReports);
 
+        /
         selfReports.forEach(function (d) {
             d.timeStamp = new Date(d.timeStamp); // Assuming TimeStamp is a date string
-            d.segment = +d.segment; // Convert to number using unary operator
-            d.selfReport = +d.selfReport; // Convert to number using unary operator
+          
         });
-
+        
         // Define the x and y domains
 
-        x.domain(d3.extent(selfReports, s => s.timeStamp));
+        x.domain(d3.extent(selfReports, s => s.segment)); // the max range of data x values
         y.domain([0, d3.max(selfReports, s => s.selfReport)]);
        
         // y.domain([0, d3.max(selfReports, s => s.selfReport)]);
@@ -291,29 +291,20 @@
         svg.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x)
-                .tickFormat(d3.timeFormat("%I:%M:%S %p")));
+                .ticks(10)
+                .tickFormat(d3.format("d")));
 
         //Add the y-axis
         svg.append("g")
             .call(d3.axisLeft(y))
 
-        //Create the line generator
-        const lineSegment = d3.line()
-            .x(s => x(s.timeStamp))
-            .y(s => y(s.segment));
+     
 
         const lineSelfReport = d3.line()
-            .x(s => x(s.timeStamp))
+            .x(s => x(s.segment))
             .y(s => y(s.selfReport));
 
-        //Add the lineSegment to the SVG element
-        svg.append("path")
-            .datum(selfReports)
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 3)
-            .attr("d", lineSegment);
-
+     
         //Add the lineSegment to the SVG element
         svg.append("path")
             .datum(selfReports)

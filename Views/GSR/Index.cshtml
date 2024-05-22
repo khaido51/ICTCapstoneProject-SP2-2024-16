@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Detecting of Onset Of Cysbersicknees using Physiological Cues";
-    ViewData["Title2"] = "GSR Report From GSR Controller";
+    ViewData["Title2"] = "GSR Report Graph";
 }
 <div class="container px-4">
     <div class="row gx-4 center justify-content-center align-items-center">
@@ -16,11 +16,7 @@
 
 
 <style>
-    /*  body {
-                  margin-top: 4rem;
-                  margin-right: 5rem;
-                  margin-left: 5rem;
-                } */
+   
     .name-1 {
         width: fit-content;
         padding: 1rem 2rem 0.5rem 2rem;
@@ -57,25 +53,7 @@
         <div class="row gx-4 justify-content-center">
             <div class="col-lg-8">
                 <h2>@ViewData["Title2"]</h2>
-                <ul class="list-inline">
-                    <div class="name-1"><p>Paritipant</p></div>
-                    <li class="list-inline-item">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="single" />
-                            <label class="form-check-label" for="single"> Single </label>
-                        </div>
-                    </li>
-                    <li class="list-inline-item">
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="Multiple" />
-                            <label class="form-check-label" for="Multiple">
-                                Multiple
-                            </label>
-                        </div>
-                    </li>
-                </ul>
+                
             </div>
         </div>
     </div>
@@ -177,23 +155,39 @@
 }
 
 <body>
-    <div id="chart-container"></div>
-    <div id="vertical-slider"></div>
+    <button id="downloadButton">Download as PNG</button>
+    <div id="chart-container">
+        <div id="vertical-slider"></div>
+    </div>
+    
     <div id="slider-range"></div>
 
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
-    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         .bar {
             fill: navy;
+        }
+
+        #chart-container {
+            display:flex;
+            background-color: white;
+        }
+        #vertical-slider {
+			margin-top: 120px;
+        }
+
+        #slider-range {
+			margin-left: 50px;
+        }
         }
     </style>
 <script>
         //Set dimensions and margins for the chart
 
-        const margin = { top: 70, right: 60, bottom: 40, left: 80 };
+        const margin = { top: 70, right: 60, bottom: 50, left: 50 };
         const width = 1200 - margin.left - margin.right;
         const height = 500 - margin.top - margin.bottom;
 
@@ -223,7 +217,9 @@
 
             //Create current Date value to assign Minutes and Seconds
             const dayTest = new Date();
+            //console.log(dayTest);
             const timeString = d.xValueTspan;
+            //console.log(timeString);
             const parts = timeString.split(":");
             const minutes = parseInt(parts[1], 10);
             const seconds = parseInt(parts[2]);
@@ -292,6 +288,7 @@
             .default(verticalRange)
             .fill('#85bb65');
 
+       
         // Update function to redraw the graph
         function updateGraph() {
             //filtering data between min and max value range from user's input for both xaxis and yaxis
@@ -344,7 +341,7 @@
             .attr("width", 500)
             .attr("height", 100)
             .append("g")
-            .attr("transform", "translate(90,30)")
+            .attr("transform", "translate(80,30)")
             .call(horizontalSlider);
 
         // Append vertical slider
@@ -353,10 +350,27 @@
             .attr("width", 100)
             .attr("height", 300)
             .append("g")
-            .attr("transform", "translate(90,30)")
+            .attr("transform", `translate(50, 20)`)
             .call(verticalSlider);
 
-       
+        //Download Image// Function to download the SVG as PNG
+        // Function to download the SVG as PNG
+        function downloadSVGAsPNG() {
+            const svgElement = document.querySelector("#chart-container");
+            html2canvas(svgElement).then(canvas => {
         
+                const a = document.createElement("a");
+                a.href = canvas.toDataURL("image/png");
+                a.download = "graph.png";
+               
+                a.click();
+          
+            });
+        }
+
+        document.getElementById("downloadButton").addEventListener("click", downloadSVGAsPNG);
+       
 </script>
+
+ 
 </body>

@@ -31,15 +31,15 @@ namespace ICTCapstoneProject.Controllers
                 }
 
            
-                /*
-                var error = this.validateFiles(listOfFileNames);
+                
+                var error = this.validateFiles(fileName);
                 if (!string.IsNullOrEmpty(error))
                 {
                     TempData["Message"] = error;
                     System.IO.File.Delete(filePath);
                     return RedirectToAction("Index");
                 }
-                */
+                
                 listOfFileNames.Add(fileName);
             }
           
@@ -49,31 +49,37 @@ namespace ICTCapstoneProject.Controllers
             //assign selfReportsDictionary and averageSelfReport with value calculated above
             return Index(new MultipleReports() { selfReportsDictionary = selfReportsDic, averageSelfReport = averageList }) ;
         }
-        /*
-        private string validateFiles(List<string> listOfFileNames)
+        
+        private string validateFiles(string file)
         {
             string error = "";
-            foreach(var file in listOfFileNames)
+
+            //var config = CsvConfiguration.FromAttributes<GSR>();
+            #region Read CSV
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", file);
+
+            using (var reader = new StreamReader(filePath))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                #region readCSV
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", file);
-                using (var reader = new StreamReader(filePath))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+
+                csv.Read();
+                csv.ReadHeader();
+                string header = csv.HeaderRecord[2].ToLowerInvariant();
+                header = header.Replace("-", "");
+                string selfReportModel = nameof(SelfReport.selfReport).ToLowerInvariant();
+
+
+                if (header != selfReportModel)
                 {
-                    csv.Read();
-                    csv.ReadHeader();
-                    string header = csv.HeaderRecord[3];
-                    string selfReportModel = nameof(SelfReport.selfReport);
-                    if(header != selfReportModel)
-                    {
-                        error = "Header is not matched, Please upload correct CSV file";
-                    }
+                    error = "Header is not matched, Please upload correct CSV file";
                 }
-                #endregion
             }
+            #endregion
+
+
             return error;
         }
-        */
+        
 
         private  Dictionary<int, List<SelfReport>> GetListOfSelfReport(List<string> listOfFileNames)
         {
