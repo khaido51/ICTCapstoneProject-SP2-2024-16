@@ -15,11 +15,11 @@ namespace ICTCapstoneProject.Controllers
     public class SelfReportController : Controller
     {
         [HttpGet]
-        public IActionResult Index(List<SelfReport> selfReports = null)
+        public IActionResult Index(List<SingleSelfReport>? selfReports = null)
         {
             if (selfReports == null)
             {
-                selfReports = new List<SelfReport>();
+                selfReports = new List<SingleSelfReport>();
             }
             return View(selfReports);
         }
@@ -27,7 +27,7 @@ namespace ICTCapstoneProject.Controllers
         [HttpPost]
         public IActionResult Index(List<IFormFile> baselineFiles, List<IFormFile> passiveFiles, List<IFormFile> activeFiles)
         {
-            List<SelfReport> selfReports = new List<SelfReport>();
+            List<SingleSelfReport> selfReports = new List<SingleSelfReport>();
 
             if (baselineFiles != null && baselineFiles.Count > 0)
             {
@@ -47,9 +47,9 @@ namespace ICTCapstoneProject.Controllers
             return Index(selfReports);
         }
 
-        private List<SelfReport> ProcessFiles(List<IFormFile> files, string sceneType)
+        private List<SingleSelfReport> ProcessFiles(List<IFormFile> files, string sceneType)
         {
-            List<SelfReport> selfReports = new List<SelfReport>();
+            List<SingleSelfReport> selfReports = new List<SingleSelfReport>();
             foreach (var file in files)
             {
                 string permittedExtension = ".csv";
@@ -94,7 +94,7 @@ namespace ICTCapstoneProject.Controllers
                 csv.Read();
                 csv.ReadHeader();
                 string header = csv.HeaderRecord[2].ToLowerInvariant().Replace("-", "");
-                string timeStampModel = nameof(SelfReport.selfReport).ToLowerInvariant();
+                string timeStampModel = nameof(SingleSelfReport.selfReport).ToLowerInvariant();
 
                 if (header != timeStampModel)
                 {
@@ -104,9 +104,9 @@ namespace ICTCapstoneProject.Controllers
             return error;
         }
 
-        private List<SelfReport> GetSelfReportList(string filePath, string sceneType)
+        private List<SingleSelfReport> GetSelfReportList(string filePath, string sceneType)
         {
-            List<SelfReport> selfReports = new List<SelfReport>();
+            List<SingleSelfReport> selfReports = new List<SingleSelfReport>();
             using (var reader = new StreamReader(filePath))
             using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
@@ -117,7 +117,7 @@ namespace ICTCapstoneProject.Controllers
                 csv.ReadHeader();
                 while (csv.Read())
                 {
-                    var report = csv.GetRecord<SelfReport>();
+                    var report = csv.GetRecord<SingleSelfReport>();
                     report.sceneType = sceneType;
                     selfReports.Add(report);
                 }
