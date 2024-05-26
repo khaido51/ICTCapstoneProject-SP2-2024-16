@@ -12,5 +12,7 @@ namespace ICTCapstoneProject.Models
 
         [Index(2)]
         public double selfReport {get; set;}
+
+        public string sceneType { get; set; }
     }
 }
