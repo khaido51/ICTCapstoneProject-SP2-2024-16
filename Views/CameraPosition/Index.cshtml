@@ -1,40 +1,9 @@
-﻿@{
-    ViewData["Title"] = "Detecting of Onset Of Cysbersicknees using Physiological Cues";
+﻿@model List<ICTCapstoneProject.Models.CameraPosition>
+@{
     ViewData["Title2"] = "Camera Position Report";
 }
-<div class="container px-4">
-    <div class="row gx-4 center justify-content-center align-items-center">
-        <div class="col-lg-8 text-center text-center">
-            <h1>@ViewData["Title"]</h1>
-
-        </div>
-    </div>
-</div>
-
-
-
-
 
 <style>
-    /*  body {
-                  margin-top: 4rem;
-                  margin-right: 5rem;
-                  margin-left: 5rem;
-                } */
-    .name-1 {
-        width: fit-content;
-        padding: 1rem 2rem 0.5rem 2rem;
-    }
-
-    .list-inline p {
-        font-size: 20px;
-        font-weight: 500;
-    }
-
-    .list-inline-item {
-        padding: 1rem 5rem 1rem 4rem;
-    }
-
     .scene-name {
         font-size: 20px;
         font-weight: 500;
@@ -52,34 +21,17 @@
         padding-left: 4rem; /* Adjusted padding */
     }
 </style>
+
 <section id="participant">
     <div class="container mt-3 mb-2 px-4">
         <div class="row gx-4 justify-content-center">
             <div class="col-lg-8">
                 <h2>@ViewData["Title2"]</h2>
-                <ul class="list-inline">
-                    <div class="name-1"><p>Paritipant</p></div>
-                    <li class="list-inline-item">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="single" />
-                            <label class="form-check-label" for="single"> Single </label>
-                        </div>
-                    </li>
-                    <li class="list-inline-item">
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="Multiple" />
-                            <label class="form-check-label" for="Multiple">
-                                Multiple
-                            </label>
-                        </div>
-                    </li>
-                </ul>
             </div>
         </div>
     </div>
 </section>
+
 <section id="scene">
     <div class="container px-4">
         <div class="row gx-4 justify-content-center">
@@ -89,20 +41,16 @@
                     <div class="row">
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       id="baseline" />
-                                <label class="form-check-label" for="baseline">
-                                    Baseline
+                                <label class="form-check-label" for="active">
+                                    SimulatedIMU
                                 </label>
                             </div>
                         </div>
-
                         <div class="col-4 d-flex align-items-center justify-content-center">
                             <form method="post"
-                                  id="uploadBaselineForm"
+                                  id="uploadActiveForm"
                                   enctype="multipart/form-data"
-                                  asp-controller="Home"
+                                  asp-controller="CameraPosition"
                                   asp-action="Index">
                                 <div class="col-md-auto d-flex align-items-center justify-content-center">
                                     <input type="file" name="file" class="form-control" />
@@ -111,78 +59,9 @@
                         </div>
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <input type="submit"
-                                   form="uploadBaselineForm"
+                                   form="uploadActiveForm"
                                    value="Upload File"
                                    class="btn btn-primary" />
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="container cont-2">
-                        <div class="row">
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           id="passive" />
-                                    <label class="form-check-label" for="passive">
-                                        Passive
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-4 d-flex align-items-center justify-content-center">
-                                <form method="post"
-                                      id="uploadPassiveForm"
-                                      enctype="multipart/form-data"
-                                      asp-controller="Home"
-                                      asp-action="Index">
-                                    <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                        <input type="file" name="file" class="form-control" />
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <input type="submit"
-                                       form="uploadPassiveForm"
-                                       value="Upload File"
-                                       class="btn btn-primary" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="container cont-2">
-                        <div class="row">
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           id="active" />
-                                    <label class="form-check-label" for="active">
-                                        Active
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-4 d-flex align-items-center justify-content-center">
-                                <form method="post"
-                                      id="uploadActiveForm"
-                                      enctype="multipart/form-data"
-                                      asp-controller="Home"
-                                      asp-action="Index">
-                                    <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                        <input type="file" name="file" class="form-control" />
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <input type="submit"
-                                       form="uploadActiveForm"
-                                       value="Upload File"
-                                       class="btn btn-primary" />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,29 +70,9 @@
     </div>
 </section>
 
+
+
 @section Scripts {
     <script>
-        $(function () {
-            $('#uploadForm').submit(function (event) {
-                event.preventDefault(); // Prevent default form submission
-
-                var formData = new FormData($(this)[0]);
-
-                $.ajax({
-                    url: '@Url.Action("SelfReport", "Home")',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        $('#uploadMessage').removeClass('alert-danger').addClass('alert-success').text('File uploaded successfully.').show();
-                        // Optionally, you can update the page content here if needed
-                    },
-                    error: function (xhr, status, error) {
-                        $('#uploadMessage').removeClass('alert-success').addClass('alert-danger').text('Error uploading file: ' + xhr.responseText).show();
-                    }
-                });
-            });
-        });
     </script>
 }
