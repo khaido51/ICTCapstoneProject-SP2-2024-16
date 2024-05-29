@@ -70,9 +70,79 @@
     </div>
 </section>
 
-
+<div class="container px-4">
+    <div class="row gx-4 justify-content-center">
+        <div class="col-lg-10">
+            <div class="table-responsive">
+                <table class="table table-bordered mt-4" id="cameraPositionsTable">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Segment</th>
+                            <th>Camera Active</th>
+                            <th>Camera Position X</th>
+                            <th>Camera Position Y</th>
+                            <th>Camera Position Z</th>
+                            <th>Camera Rotation X</th>
+                            <th>Camera Rotation Y</th>
+                            <th>Camera Rotation Z</th>
+                            <th>Camera Rotation W</th>
+                            <th>Camera Velocity X</th>
+                            <th>Camera Velocity Y</th>
+                            <th>Camera Velocity Z</th>
+                            <th>Camera Acceleration X</th>
+                            <th>Camera Acceleration Y</th>
+                            <th>Camera Acceleration Z</th>
+                            <th>Camera Angular Velocity X</th>
+                            <th>Camera Angular Velocity Y</th>
+                            <th>Camera Angular Velocity Z</th>
+                            <th>Camera Angular Acceleration X</th>
+                            <th>Camera Angular Acceleration Y</th>
+                            <th>Camera Angular Acceleration Z</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Math.Min(Model.Count, 10); i++)
+                        {
+                            var item = Model[i];
+                            <tr>
+                                <td>@item.Timestamp</td>
+                                <td>@item.Segment</td>
+                                <td>@item.CameraActive</td>
+                                <td>@item.CameraPositionX</td>
+                                <td>@item.CameraPositionY</td>
+                                <td>@item.CameraPositionZ</td>
+                                <td>@item.CameraRotationX</td>
+                                <td>@item.CameraRotationY</td>
+                                <td>@item.CameraRotationZ</td>
+                                <td>@item.CameraRotationW</td>
+                                <td>@item.CameraVelocityX</td>
+                                <td>@item.CameraVelocityY</td>
+                                <td>@item.CameraVelocityZ</td>
+                                <td>@item.CameraAccelerationX</td>
+                                <td>@item.CameraAccelerationY</td>
+                                <td>@item.CameraAccelerationZ</td>
+                                <td>@item.CameraAngularVelocityX</td>
+                                <td>@item.CameraAngularVelocityY</td>
+                                <td>@item.CameraAngularVelocityZ</td>
+                                <td>@item.CameraAngularAccelerationX</td>
+                                <td>@item.CameraAngularAccelerationY</td>
+                                <td>@item.CameraAngularAccelerationZ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (Model.Count > 100)
+                {
+                    <button id="loadMore" class="btn btn-primary">Show More</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+        
     </script>
 }
