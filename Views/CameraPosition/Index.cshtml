@@ -1,38 +1,188 @@
-﻿@{
-    ViewData["Title"] = "Detecting of Onset Of Cysbersicknees using Physiological Cues";
+﻿@model List<ICTCapstoneProject.Models.CameraPosition>
+
+@{
     ViewData["Title2"] = "Camera Position Report";
 }
-<div class="container px-4">
-    <div class="row gx-4 center justify-content-center align-items-center">
-        <div class="col-lg-8 text-center text-center">
-            <h1>@ViewData["Title"]</h1>
-
-        </div>
-    </div>
-</div>
-
-
-
-
 
 <style>
-    /*  body {
-                  margin-top: 4rem;
-                  margin-right: 5rem;
-                  margin-left: 5rem;
-                } */
-    .name-1 {
-        width: fit-content;
-        padding: 1rem 2rem 0.5rem 2rem;
+    [slider] {
+        position: relative;
+        height: 14px;
+        border-radius: 10px;
+        text-align: left;
+        margin: 45px 0 10px 0;
     }
 
-    .list-inline p {
-        font-size: 20px;
-        font-weight: 500;
+        [slider] > div {
+            position: absolute;
+            left: 13px;
+            right: 15px;
+            height: 14px;
+        }
+
+            [slider] > div > [inverse-left] {
+                position: absolute;
+                left: 0;
+                height: 14px;
+                border-radius: 10px;
+                background-color: #CCC;
+                margin: 0 7px;
+            }
+
+            [slider] > div > [inverse-right] {
+                position: absolute;
+                right: 0;
+                height: 14px;
+                border-radius: 10px;
+                background-color: #CCC;
+                margin: 0 7px;
+            }
+
+            [slider] > div > [range] {
+                position: absolute;
+                left: 0;
+                height: 14px;
+                border-radius: 14px;
+                background-color: #1ABC9C;
+            }
+
+            [slider] > div > [thumb] {
+                position: absolute;
+                top: -7px;
+                z-index: 2;
+                height: 28px;
+                width: 28px;
+                text-align: left;
+                margin-left: -11px;
+                cursor: pointer;
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+                background-color: #FFF;
+                border-radius: 50%;
+                outline: none;
+            }
+
+        [slider] > input[type=range] {
+            position: absolute;
+            pointer-events: none;
+            -webkit-appearance: none;
+            z-index: 3;
+            height: 14px;
+            top: -2px;
+            width: 100%;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+            filter: alpha(opacity=0);
+            -moz-opacity: 0;
+            -khtml-opacity: 0;
+            opacity: 0;
+        }
+
+    div[slider] > input[type=range]::-ms-track {
+        -webkit-appearance: none;
+        background: transparent;
+        color: transparent;
     }
 
-    .list-inline-item {
-        padding: 1rem 5rem 1rem 4rem;
+    div[slider] > input[type=range]::-moz-range-track {
+        -moz-appearance: none;
+        background: transparent;
+        color: transparent;
+    }
+
+    div[slider] > input[type=range]:focus::-webkit-slider-runnable-track {
+        background: transparent;
+        border: transparent;
+    }
+
+    div[slider] > input[type=range]:focus {
+        outline: none;
+    }
+
+    div[slider] > input[type=range]::-ms-thumb {
+        pointer-events: all;
+        width: 28px;
+        height: 28px;
+        border-radius: 0px;
+        border: 0 none;
+        background: red;
+    }
+
+    div[slider] > input[type=range]::-moz-range-thumb {
+        pointer-events: all;
+        width: 28px;
+        height: 28px;
+        border-radius: 0px;
+        border: 0 none;
+        background: red;
+    }
+
+    div[slider] > input[type=range]::-webkit-slider-thumb {
+        pointer-events: all;
+        width: 28px;
+        height: 28px;
+        border-radius: 0px;
+        border: 0 none;
+        background: red;
+        -webkit-appearance: none;
+    }
+
+    div[slider] > input[type=range]::-ms-fill-lower {
+        background: transparent;
+        border: 0 none;
+    }
+
+    div[slider] > input[type=range]::-ms-fill-upper {
+        background: transparent;
+        border: 0 none;
+    }
+
+    div[slider] > input[type=range]::-ms-tooltip {
+        display: none;
+    }
+
+    [slider] > div > [sign] {
+        opacity: 0;
+        position: absolute;
+        margin-left: -11px;
+        top: -39px;
+        z-index: 3;
+        background-color: #1ABC9C;
+        color: #fff;
+        width: 28px;
+        height: 28px;
+        border-radius: 28px;
+        -webkit-border-radius: 28px;
+        align-items: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+        [slider] > div > [sign]:after {
+            position: absolute;
+            content: '';
+            left: 0;
+            border-radius: 16px;
+            top: 19px;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top-width: 16px;
+            border-top-style: solid;
+            border-top-color: #1ABC9C;
+        }
+
+        [slider] > div > [sign] > span {
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 28px;
+        }
+
+    [slider]:hover > div > [sign] {
+        opacity: 1;
+    }
+
+    th, td {
+        font-size: 0.9em;
+        padding: 8px;
     }
 
     .scene-name {
@@ -51,31 +201,22 @@
     .form-check {
         padding-left: 4rem; /* Adjusted padding */
     }
+
+    .graph-container {
+        width: 100%;
+        height: 500px;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
 </style>
 <section id="participant">
     <div class="container mt-3 mb-2 px-4">
         <div class="row gx-4 justify-content-center">
             <div class="col-lg-8">
                 <h2>@ViewData["Title2"]</h2>
-                <ul class="list-inline">
-                    <div class="name-1"><p>Paritipant</p></div>
-                    <li class="list-inline-item">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="single" />
-                            <label class="form-check-label" for="single"> Single </label>
-                        </div>
-                    </li>
-                    <li class="list-inline-item">
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="Multiple" />
-                            <label class="form-check-label" for="Multiple">
-                                Multiple
-                            </label>
-                        </div>
-                    </li>
-                </ul>
             </div>
         </div>
     </div>
@@ -89,20 +230,17 @@
                     <div class="row">
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       id="baseline" />
-                                <label class="form-check-label" for="baseline">
-                                    Baseline
+                                <label class="form-check-label" for="active">
+                                    SimulatedIMU
                                 </label>
                             </div>
                         </div>
 
                         <div class="col-4 d-flex align-items-center justify-content-center">
                             <form method="post"
-                                  id="uploadBaselineForm"
+                                  id="uploadActiveForm"
                                   enctype="multipart/form-data"
-                                  asp-controller="Home"
+                                  asp-controller="CameraPosition"
                                   asp-action="Index">
                                 <div class="col-md-auto d-flex align-items-center justify-content-center">
                                     <input type="file" name="file" class="form-control" />
@@ -111,78 +249,9 @@
                         </div>
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <input type="submit"
-                                   form="uploadBaselineForm"
+                                   form="uploadActiveForm"
                                    value="Upload File"
                                    class="btn btn-primary" />
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="container cont-2">
-                        <div class="row">
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           id="passive" />
-                                    <label class="form-check-label" for="passive">
-                                        Passive
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-4 d-flex align-items-center justify-content-center">
-                                <form method="post"
-                                      id="uploadPassiveForm"
-                                      enctype="multipart/form-data"
-                                      asp-controller="Home"
-                                      asp-action="Index">
-                                    <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                        <input type="file" name="file" class="form-control" />
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <input type="submit"
-                                       form="uploadPassiveForm"
-                                       value="Upload File"
-                                       class="btn btn-primary" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="container cont-2">
-                        <div class="row">
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           id="active" />
-                                    <label class="form-check-label" for="active">
-                                        Active
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-4 d-flex align-items-center justify-content-center">
-                                <form method="post"
-                                      id="uploadActiveForm"
-                                      enctype="multipart/form-data"
-                                      asp-controller="Home"
-                                      asp-action="Index">
-                                    <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                        <input type="file" name="file" class="form-control" />
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                <input type="submit"
-                                       form="uploadActiveForm"
-                                       value="Upload File"
-                                       class="btn btn-primary" />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,29 +260,439 @@
     </div>
 </section>
 
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-4">
+            <select id="graphSelector" class="form-select">
+                <option value="3D">3D graph(Camera Position & Velocity)</option>
+                <option value="Acceleration">Acceleration graphs(Camera Acceleration & Angular Velocity)</option>
+                <option value="Rotation">Rotation graphs(Camera Rotation & Angular Velocity)</option>
+            </select>
+        </div>
+        <div class="col-lg-8">
+            <label>
+                <input type="radio" name="axis" class="radio" value="X" checked />X
+            </label>
+            <label>
+                <input type="radio" name="axis" class="radio" value="Y" />Y
+            </label>
+            <label>
+                <input type="radio" name="axis" class="radio" value="Z" />Z
+            </label>
+        </div>
+    </div>
+</div>
+
+<div id="plotlyGraph" class="graph-container" style="display: none;"></div>
+<div id="plotlyGraphAcceleration" class="graph-container" style="display: none;"></div>
+<div id="plotlyGraphAngularVelocity" class="graph-container" style="display: none;"></div>
+<div id="plotlyGraphRotationX" class="graph-container" style="display: none;"></div>
+<div id="plotlyGraphRotationY" class="graph-container" style="display: none;"></div>
+<div id="plotlyGraphRotationZ" class="graph-container" style="display: none;"></div>
+
+<div slider id="slider-distance">
+    <div>
+        <div inverse-left style="width:70%;"></div>
+        <div inverse-right style="width:70%;"></div>
+        <div range style="left:0%; right:0%;"></div>
+        <span thumb style="left:0%;"></span>
+        <span thumb style="left:100%;"></span>
+        <div sign style="left:0%;">
+            <span id="value">0</span>
+        </div>
+        <div sign style="left:100%;">
+            <span id="value">@ViewBag.MaxMinutes</span>
+        </div>
+    </div>
+    <input type="range" tabindex="0" value="0" max="@ViewBag.MaxMinutes" min="0" step="1" oninput="updateMinSlider(this)" />
+    <input type="range" tabindex="0" value="@ViewBag.MaxMinutes" max="@ViewBag.MaxMinutes" min="0" step="1" oninput="updateMaxSlider(this)" />
+</div>
+
+
+<div class="container px-4">
+    <div class="row gx-4 justify-content-center">
+        <div class="col-lg-10">
+            <div class="table-responsive">
+                <table class="table table-bordered mt-4" id="cameraPositionsTable">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Segment</th>
+                            <th>Camera Active</th>
+
+                            <th>Camera Position X</th>
+                            <th>Camera Position Y</th>
+                            <th>Camera Position Z</th>
+
+                            <th>CameraRotationX</th>
+                            <th>CameraRotationY</th>
+                            <th>CameraRotationZ</th>
+                            <th>CameraRotationW</th>
+
+                            <th>CameraVelocityX</th>
+                            <th>CameraVelocityY</th>
+                            <th>CameraVelocityZ</th>
+
+                            <th>CameraAccelerationX</th>
+                            <th>CameraAccelerationY</th>
+                            <th>CameraAccelerationZ</th>
+
+                            <th>CameraAngularVelocityX</th>
+                            <th>CameraAngularVelocityY</th>
+                            <th>CameraAngularVelocityZ</th>
+
+                            <th>CameraAngularAccelerationX</th>
+                            <th>CameraAngularAccelerationY</th>
+                            <th>CameraAngularAccelerationZ</th>
+
+                            <!-- Add other headers based on your model -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Math.Min(Model.Count, 10); i++)
+                        {
+                            var item = Model[i];
+                            <tr>
+                                <td>@item.Timestamp</td>
+                                <td>@item.Segment</td>
+                                <td>@item.CameraActive</td>
+
+                                <td>@item.CameraPositionX</td>
+                                <td>@item.CameraPositionY</td>
+                                <td>@item.CameraPositionZ</td>
+
+                                <td>@item.CameraRotationX</td>
+                                <td>@item.CameraRotationY</td>
+                                <td>@item.CameraRotationZ</td>
+                                <td>@item.CameraRotationW</td>
+
+                                <td>@item.CameraVelocityX</td>
+                                <td>@item.CameraVelocityY</td>
+                                <td>@item.CameraVelocityZ</td>
+
+                                <td>@item.CameraAccelerationX</td>
+                                <td>@item.CameraAccelerationY</td>
+                                <td>@item.CameraAccelerationZ</td>
+
+                                <td>@item.CameraAngularVelocityX</td>
+                                <td>@item.CameraAngularVelocityY</td>
+                                <td>@item.CameraAngularVelocityZ</td>
+
+                                <td>@item.CameraAngularAccelerationX</td>
+                                <td>@item.CameraAngularAccelerationY</td>
+                                <td>@item.CameraAngularAccelerationZ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (Model.Count > 100)
+                {
+                    <button id="loadMore" class="btn btn-primary">Show More</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
-        $(function () {
-            $('#uploadForm').submit(function (event) {
-                event.preventDefault(); // Prevent default form submission
+        const modelData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+        let filteredDataCache = {}; // Cache for filtered data
+        let debounceTimeout; // Debounce timeout
 
-                var formData = new FormData($(this)[0]);
+        function debounce(func, wait) {
+            return function (...args) {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
 
-                $.ajax({
-                    url: '@Url.Action("SelfReport", "Home")',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        $('#uploadMessage').removeClass('alert-danger').addClass('alert-success').text('File uploaded successfully.').show();
-                        // Optionally, you can update the page content here if needed
-                    },
-                    error: function (xhr, status, error) {
-                        $('#uploadMessage').removeClass('alert-success').addClass('alert-danger').text('Error uploading file: ' + xhr.responseText).show();
-                    }
-                });
+        function createGraphTrace(xValues, yValues, axisLabel, color) {
+            return {
+                x: xValues,
+                y: yValues,
+                mode: 'lines+markers',
+                type: 'scatter',
+                line: { 
+                    color: color,
+                    width: 0.1,
+                },
+                name: axisLabel,
+                marker: { size: 1 },
+            };
+        }
+
+        function renderGraph(elementId, traces, title, yLabel) {
+            const layout = {
+                title: title,
+                autosize: true,
+                xaxis: { title: 'Time' },
+                yaxis: { title: yLabel },
+                margin: { l: 50, r: 50, b: 50, t: 50 }
+            };
+
+            Plotly.Plots.resize(elementId);
+            Plotly.newPlot(elementId, traces, layout);
+        }
+
+        //CameraPosition 3D graph
+        function renderPlotlyGraph(cameraPositions) {
+            const xValues = cameraPositions.map(p => p.CameraPositionX);
+            const yValues = cameraPositions.map(p => p.CameraPositionZ);
+            const zValues = cameraPositions.map(p => p.CameraPositionY);
+            const velocityMagnitudes = cameraPositions.map(p => Math.sqrt(p.CameraVelocityX ** 2 + p.CameraVelocityY ** 2 + p.CameraVelocityZ ** 2));
+
+            const trace = {
+                x: xValues,
+                y: yValues,
+                z: zValues,
+                mode: 'lines+markers',
+                type: 'scatter3d',
+                marker: {
+                    size: 1,
+                    color: velocityMagnitudes,
+                    colorscale: 'Viridis',
+                    colorbar: { title: 'Speed' },
+                    opacity: 0.8
+                },
+                line: {
+                    color: velocityMagnitudes,
+                    colorscale: 'Viridis',
+                    width: 6
+                }
+            };
+
+            const layout = {
+                title: '3D Trajectory of Camera with Velocity Color Coding',
+                autosize: true,
+                scene: {
+                    xaxis: { title: 'X Position (meters)' },
+                    yaxis: { title: 'Y Position (meters)' },
+                    zaxis: { title: 'Z Position (meters)' }
+                },
+                margin: { l: 50, r: 50, b: 50, t: 50 }
+            };
+
+            Plotly.Plots.resize('plotlyGraph');
+            Plotly.newPlot('plotlyGraph', [trace], layout);
+        }
+
+        function renderCameraAccelerationGraph(cameraPositions, axis) {
+            const xValues = cameraPositions.map(p => p.Timestamp);
+            let yValues;
+            let yLabel;
+
+            switch (axis) {
+                case 'X':
+                    yValues = cameraPositions.map(p => p.CameraAccelerationX);
+                    yLabel = 'Acceleration X (m/s²)';
+                    break;
+                case 'Y':
+                    yValues = cameraPositions.map(p => p.CameraAccelerationY);
+                    yLabel = 'Acceleration Y (m/s²)';
+                    break;
+                case 'Z':
+                    yValues = cameraPositions.map(p => p.CameraAccelerationZ);
+                    yLabel = 'Acceleration Z (m/s²)';
+                    break;
+                default:
+                    yValues = cameraPositions.map(p => p.CameraAccelerationX);
+                    yLabel = 'Acceleration X (m/s²)';
+                    break;
+            }
+
+            const trace = createGraphTrace(xValues, yValues, `Camera Acceleration ${axis}`, 'blue');
+            renderGraph('plotlyGraphAcceleration', [trace], `Camera Acceleration ${axis} Over Time`, yLabel);
+        }
+
+        function renderCameraAngularVelocityGraph(cameraPositions, axis) {
+            const xValues = cameraPositions.map(p => p.Timestamp);
+            let yValues;
+            let yLabel;
+
+            switch (axis) {
+                case 'X':
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityX);
+                    yLabel = 'Angular Velocity X (rad/s)';
+                    break;
+                case 'Y':
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityY);
+                    yLabel = 'Angular Velocity Y (rad/s)';
+                    break;
+                case 'Z':
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityZ);
+                    yLabel = 'Angular Velocity Z (rad/s)';
+                    break;
+                default:
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityX);
+                    yLabel = 'Angular Velocity X (rad/s)';
+                    break;
+            }
+
+            const trace = createGraphTrace(xValues, yValues, `Camera Angular Velocity ${axis}`, 'red');
+            renderGraph('plotlyGraphAngularVelocity', [trace], `Camera Angular Velocity ${axis} Over Time`, yLabel);
+        }
+
+        function renderCameraRotationGraph(cameraPositions) {
+            const xValues = cameraPositions.map(p => p.Timestamp);
+            const yValuesX = cameraPositions.map(p => p.CameraRotationX);
+            const yValuesY = cameraPositions.map(p => p.CameraRotationY);
+            const yValuesZ = cameraPositions.map(p => p.CameraRotationZ);
+
+            const traceX = createGraphTrace(xValues, yValuesX, 'Camera Rotation X (quaternion)', 'purple');
+            const traceY = createGraphTrace(xValues, yValuesY, 'Camera Rotation Y (quaternion)', 'green');
+            const traceZ = createGraphTrace(xValues, yValuesZ, 'Camera Rotation Z (quaternion)', 'blue');
+
+            renderGraph('plotlyGraphRotationX', [traceX], 'Camera Rotation X Over Time', 'Rotation X (quaternion)');
+            renderGraph('plotlyGraphRotationY', [traceY], 'Camera Rotation Y Over Time', 'Rotation Y (quaternion)');
+            renderGraph('plotlyGraphRotationZ', [traceZ], 'Camera Rotation Z Over Time', 'Rotation Z (quaternion)');
+        }
+
+        //Time Range Slider
+        function updateMinSlider(input) {
+            var maxInput = input.parentNode.getElementsByTagName('input')[1];
+            if (parseInt(input.value) >= parseInt(maxInput.value)) {
+                input.value = parseInt(maxInput.value) - 1;
+            }
+            updateSliderDisplay(input);
+            optimizedFilterGraphData();
+        }
+
+        function updateMaxSlider(input) {
+            var minInput = input.parentNode.getElementsByTagName('input')[0];
+            if (parseInt(input.value) <= parseInt(minInput.value)) {
+                input.value = parseInt(minInput.value) + 1;
+            }
+            updateSliderDisplay(input);
+            optimizedFilterGraphData();
+        }
+
+        function updateSliderDisplay(input) {
+            const value = (100 / (parseInt(input.max) - parseInt(input.min))) * parseInt(input.value) - (100 / (parseInt(input.max) - parseInt(input.min))) * parseInt(input.min);
+            const children = input.parentNode.childNodes[1].childNodes;
+            if (input === input.parentNode.getElementsByTagName('input')[0]) {
+                children[1].style.width = value + '%';
+                children[5].style.left = value + '%';
+                children[7].style.left = value + '%';
+                children[11].style.left = value + '%';
+                children[11].childNodes[1].innerHTML = input.value;
+            } else {
+                children[3].style.width = (100 - value) + '%';
+                children[5].style.right = (100 - value) + '%';
+                children[9].style.left = value + '%';
+                children[13].style.left = value + '%';
+                children[13].childNodes[1].innerHTML = input.value;
+            }
+        }
+
+        function filterGraphData() {
+            const minSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[0].value);
+            const maxSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[1].value);
+            const cacheKey = `${minSliderValue}-${maxSliderValue}`;
+
+            if (filteredDataCache[cacheKey]) {
+                return filteredDataCache[cacheKey];
+            }
+
+            const filteredData = modelData.filter(p => {
+                const minutes = (new Date(p.Timestamp) - new Date(modelData[0].Timestamp)) / 60000;
+                return minutes >= minSliderValue && minutes <= maxSliderValue;
             });
+
+            filteredDataCache[cacheKey] = filteredData;
+            return filteredData;
+        }
+
+        const optimizedFilterGraphData = debounce(() => {
+            const filteredData = filterGraphData();
+            const selectedGraph = document.getElementById("graphSelector").value;
+            const selectedAxis = document.querySelector('input[name="axis"]:checked').value;
+
+            // Hide all graphs
+            document.getElementById('plotlyGraph').style.display = 'none';
+            document.getElementById('plotlyGraphAcceleration').style.display = 'none';
+            document.getElementById('plotlyGraphAngularVelocity').style.display = 'none';
+            document.getElementById('plotlyGraphRotationX').style.display = 'none';
+            document.getElementById('plotlyGraphRotationY').style.display = 'none';
+            document.getElementById('plotlyGraphRotationZ').style.display = 'none';
+
+            if (selectedGraph === "Acceleration") {
+                renderCameraAccelerationGraph(filteredData, selectedAxis);
+                renderCameraAngularVelocityGraph(filteredData, selectedAxis);
+                document.getElementById('plotlyGraphAcceleration').style.display = 'block';
+                document.getElementById('plotlyGraphAngularVelocity').style.display = 'block';
+            } else if (selectedGraph === "Rotation") {
+                renderCameraRotationGraph(filteredData);
+                renderCameraAngularVelocityGraph(filteredData, selectedAxis);
+                document.getElementById('plotlyGraphRotationX').style.display = 'block';
+                document.getElementById('plotlyGraphRotationY').style.display = 'block';
+                document.getElementById('plotlyGraphRotationZ').style.display = 'block';
+                document.getElementById('plotlyGraphAngularVelocity').style.display = 'block';
+            } else {
+                renderPlotlyGraph(filteredData);
+                document.getElementById('plotlyGraph').style.display = 'block';
+            }
+        }, 300);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderPlotlyGraph(modelData);
+
+            document.getElementById("graphSelector").addEventListener("change", optimizedFilterGraphData);
+            document.querySelectorAll('input[name="axis"]').forEach((radio) => {
+                radio.addEventListener("change", optimizedFilterGraphData);
+            });
+
+            // Initially render 3D graph with the default axis
+            document.getElementById('plotlyGraph').style.display = 'block';
+        });
+
+        //Display Data Table function
+        const totalRows = @Model.Count; // Total number of rows available
+        let displayedRows = 10; // Rows displayed
+
+        document.getElementById("loadMore").addEventListener("click", function () {
+            const tableBody = document.getElementById("cameraPositionsTable").getElementsByTagName("tbody")[0];
+            const rowsToAdd = Math.min(displayedRows + 10, totalRows); // New target number of rows to display
+
+            for (let i = displayedRows; i < rowsToAdd; i++) {
+                const item = modelData[i];
+                const row = tableBody.insertRow();
+
+                row.innerHTML = `
+                    <td>${item.Timestamp}</td>
+                    <td>${item.Segment}</td>
+                    <td>${item.CameraActive}</td>
+                    <td>${item.CameraPositionX}</td>
+                    <td>${item.CameraPositionY}</td>
+                    <td>${item.CameraPositionZ}</td>
+                    <td>${item.CameraRotationX}</td>
+                    <td>${item.CameraRotationY}</td>
+                    <td>${item.CameraRotationZ}</td>
+                    <td>${item.CameraRotationW}</td>
+                    <td>${item.CameraVelocityX}</td>
+                    <td>${item.CameraVelocityY}</td>
+                    <td>${item.CameraVelocityZ}</td>
+                    <td>${item.CameraAccelerationX}</td>
+                    <td>${item.CameraAccelerationY}</td>
+                    <td>${item.CameraAccelerationZ}</td>
+                    <td>${item.CameraAngularVelocityX}</td>
+                    <td>${item.CameraAngularVelocityY}</td>
+                    <td>${item.CameraAngularVelocityZ}</td>
+                    <td>${item.CameraAngularAccelerationX}</td>
+                    <td>${item.CameraAngularAccelerationY}</td>
+                    <td>${item.CameraAngularAccelerationZ}</td>
+                `;
+            }
+
+            displayedRows = rowsToAdd;
+            if (displayedRows >= totalRows) {
+                document.getElementById("loadMore").style.display = "none";
+            }
         });
     </script>
+
+
 }
