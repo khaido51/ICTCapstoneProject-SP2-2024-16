@@ -139,7 +139,7 @@
 
         // Add a legend above the chart and align it to the right
         const legend = svg.append("g")
-            .attr("transform", `translate(${width - 100}, -60)`); // Adjust this value to move the legend up or down
+            .attr("transform", `translate(${width - 100}, -60)`);
 
         const color = d3.scaleOrdinal()
             .domain(["Baseline", "Passive", "Active"])
