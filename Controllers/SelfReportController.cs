@@ -1,177 +1,127 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using ICTCapstoneProject.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 
 namespace ICTCapstoneProject.Controllers
 {
     public class SelfReportController : Controller
     {
-
         [HttpGet]
-        public IActionResult Index(List<SelfReport> selfReports)
+        public IActionResult Index(List<SingleSelfReport>? selfReports = null)
         {
-        
             if (selfReports == null)
             {
-                selfReports = new List<SelfReport>();
+                selfReports = new List<SingleSelfReport>();
             }
-            else
-            {
-                selfReports = selfReports.ToList();
-            }
-
             return View(selfReports);
         }
-       
-        /*
+
         [HttpPost]
-        public IActionResult Index(List<IFormFile> file)
+        public IActionResult Index(List<IFormFile> baselineFiles, List<IFormFile> passiveFiles, List<IFormFile> activeFiles)
         {
-            List<SelfReport> selfReport = new List<SelfReport>();
-            int count = 0;
-            foreach (var fileItem in file)
+            List<SingleSelfReport> selfReports = new List<SingleSelfReport>();
+
+            if (baselineFiles != null && baselineFiles.Count > 0)
+            {
+                selfReports.AddRange(ProcessFiles(baselineFiles, "Baseline"));
+            }
+
+            if (passiveFiles != null && passiveFiles.Count > 0)
+            {
+                selfReports.AddRange(ProcessFiles(passiveFiles, "Passive"));
+            }
+
+            if (activeFiles != null && activeFiles.Count > 0)
+            {
+                selfReports.AddRange(ProcessFiles(activeFiles, "Active"));
+            }
+
+            return Index(selfReports);
+        }
+
+        private List<SingleSelfReport> ProcessFiles(List<IFormFile> files, string sceneType)
+        {
+            List<SingleSelfReport> selfReports = new List<SingleSelfReport>();
+            foreach (var file in files)
             {
                 string permittedExtension = ".csv";
-                var extension = Path.GetExtension(fileItem.FileName);
-                //Get the file name
-                var fileName = Path.GetFileNameWithoutExtension(fileItem.FileName);
-                //Get the Path and store the fileName under files folder 
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
+                var extension = Path.GetExtension(file.FileName);
+                var fileName = Path.GetFileName(file.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", fileName);
+
                 if (extension != permittedExtension)
                 {
                     TempData["Message"] = "Please Upload Only .csv file permitted";
-                    return RedirectToAction("Index");
+                    continue;
                 }
 
-                else
-                {   
-                    if(fileName == fileItem.FileName)
-                    {
-                        count++;
-                        fileName = fileName + count + extension;
-                        using (var stream = System.IO.File.Create(filePath))
-                        {
-                            fileItem.CopyTo(stream);
-
-                        }
-
-                        //selfReport = this.GetListOfSelfReport(file);
-                    }
-                   
-                   
-                }
-            }
-            return View(selfReport);
-        }
-        */
-        /*
-        private List<SelfReport> GetListOfSelfReport(List<IFormFile> file)
-        {
-
-            //Dictionary<int, List<SelfReport>> selfReportDictionary = new Dictionary<int, List<SelfReport>>();
-
-            throw new NotImplementedException();
-        }
-        */
-
-        [HttpPost]
-        public IActionResult Index(IFormFile file)
-        {
-            string permittedExtension = ".csv";
-            var extension = Path.GetExtension(file.FileName);
-            //Get the file name
-            var fileName = Path.GetFileName(file.FileName);
-            //Get the Path and store the fileName under files folder 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
-
-
-            if (extension != permittedExtension)
-            {
-                TempData["Message"] = "Please Upload Only .csv file permitted";
-                return RedirectToAction("Index");
-            }
-
-            else
-            {
-                using (var stream = System.IO.File.Create(filePath))
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     file.CopyTo(stream);
-
                 }
 
-                //validate csv structure
-                var error = this.validateFile(fileName);
+                var error = ValidateFile(filePath);
                 if (!string.IsNullOrEmpty(error))
                 {
                     TempData["Message"] = error;
                     System.IO.File.Delete(filePath);
-                    return RedirectToAction("Index");
+                    continue;
                 }
 
-                var selfReports = this.GetSelfReportList(fileName);
-                return Index(selfReports);
+                var fileSelfReports = GetSelfReportList(filePath, sceneType);
+                selfReports.AddRange(fileSelfReports);
             }
-
+            return selfReports;
         }
-        
-        private string validateFile(string fileName)
+
+        private string ValidateFile(string filePath)
         {
             string error = "";
-
-            //var config = CsvConfiguration.FromAttributes<GSR>();
-            #region Read CSV
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
-
             using (var reader = new StreamReader(filePath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-
+                MissingFieldFound = null
+            }))
+            {
                 csv.Read();
                 csv.ReadHeader();
-                string header = csv.HeaderRecord[2].ToLowerInvariant();
-                header = header.Replace("-", "");
-                string timeStampModel = nameof(SelfReport.selfReport).ToLowerInvariant();
-                
+                string header = csv.HeaderRecord[2].ToLowerInvariant().Replace("-", "");
+                string timeStampModel = nameof(SingleSelfReport.selfReport).ToLowerInvariant();
 
                 if (header != timeStampModel)
                 {
                     error = "Header is not matched, Please upload correct CSV file";
                 }
             }
-            #endregion
-
-
             return error;
         }
 
-        private List<SelfReport> GetSelfReportList(string fileName)
+        private List<SingleSelfReport> GetSelfReportList(string filePath, string sceneType)
         {
-            List<SelfReport> selfReports = new List<SelfReport>();
-
-            #region Read CSV
-            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files");
-            var filePath = Path.Combine(directoryPath, fileName);
-
-            //var path = $"{Directory.GetCurrentDirectory()}{@"\wwwroot\files"}" + "\\" + fileName;
+            List<SingleSelfReport> selfReports = new List<SingleSelfReport>();
             using (var reader = new StreamReader(filePath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-             
-                    csv.Read();
-                    csv.ReadHeader();
-                    while (csv.Read())
-                    {
-                        var report = csv.GetRecord<SelfReport>();
-                        selfReports.Add(report);
-                    }
-                
-               
+                MissingFieldFound = null
+            }))
+            {
+                csv.Read();
+                csv.ReadHeader();
+                while (csv.Read())
+                {
+                    var report = csv.GetRecord<SingleSelfReport>();
+                    report.sceneType = sceneType;
+                    selfReports.Add(report);
+                }
             }
-            #endregion
             return selfReports;
         }
     }
