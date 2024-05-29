@@ -143,6 +143,49 @@
 
 @section Scripts {
     <script>
-        
+        const modelData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+
+        const totalRows = @Model.Count; // Total number of rows available
+        let displayedRows = 10; // Rows displayed
+
+        document.getElementById("loadMore").addEventListener("click", function () {
+            const tableBody = document.getElementById("cameraPositionsTable").getElementsByTagName("tbody")[0];
+            const rowsToAdd = Math.min(displayedRows + 10, totalRows); // New target number of rows to display
+
+            for (let i = displayedRows; i < rowsToAdd; i++) {
+                const item = modelData[i];
+                const row = tableBody.insertRow();
+
+                row.innerHTML = `
+                            <td>${item.Timestamp}</td>
+                            <td>${item.Segment}</td>
+                            <td>${item.CameraActive}</td>
+                            <td>${item.CameraPositionX}</td>
+                            <td>${item.CameraPositionY}</td>
+                            <td>${item.CameraPositionZ}</td>
+                            <td>${item.CameraRotationX}</td>
+                            <td>${item.CameraRotationY}</td>
+                            <td>${item.CameraRotationZ}</td>
+                            <td>${item.CameraRotationW}</td>
+                            <td>${item.CameraVelocityX}</td>
+                            <td>${item.CameraVelocityY}</td>
+                            <td>${item.CameraVelocityZ}</td>
+                            <td>${item.CameraAccelerationX}</td>
+                            <td>${item.CameraAccelerationY}</td>
+                            <td>${item.CameraAccelerationZ}</td>
+                            <td>${item.CameraAngularVelocityX}</td>
+                            <td>${item.CameraAngularVelocityY}</td>
+                            <td>${item.CameraAngularVelocityZ}</td>
+                            <td>${item.CameraAngularAccelerationX}</td>
+                            <td>${item.CameraAngularAccelerationY}</td>
+                            <td>${item.CameraAngularAccelerationZ}</td>
+                        `;
+            }
+
+            displayedRows = rowsToAdd;
+            if (displayedRows >= totalRows) {
+                document.getElementById("loadMore").style.display = "none";
+            }
+        });
     </script>
 }
