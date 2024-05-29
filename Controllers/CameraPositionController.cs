@@ -16,9 +16,7 @@ namespace ICTCapstoneProject.Controllers
     {
         public class NullableDoubleConverter : DefaultTypeConverter
         {
-
-            //Custom converter using the NullableDoubleConverter class to return null if a CSV field is ‘null’
-            public override object? ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+            public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
             {
                 // Check if the text is "NULL" and return null in that case.
                 if (string.Equals(text, "NULL", StringComparison.OrdinalIgnoreCase))
@@ -38,7 +36,6 @@ namespace ICTCapstoneProject.Controllers
             }
         }
 
-        //Parses timestamps, calculates and returns the difference between the first and last timestamps in minutes.
         private int GetTotalMinutesRange(string filePath)
         {
             List<string> timestamps = new List<string>();
@@ -62,7 +59,6 @@ namespace ICTCapstoneProject.Controllers
             return 0;
         }
 
-        //Returns the initial view for displaying a list of camera position data.
         [HttpGet]
         public IActionResult Index(List<CameraPosition> cameraPositions = null)
         {
@@ -70,7 +66,6 @@ namespace ICTCapstoneProject.Controllers
             return View(cameraPositions);
         }
 
-        //Receives the uploaded CSV file and stores it on the server.
         [HttpPost]
         public IActionResult Index(IFormFile file, [FromServices] IWebHostEnvironment hostingEnvironment)
         {
@@ -88,11 +83,9 @@ namespace ICTCapstoneProject.Controllers
             int maxMinutes = GetTotalMinutesRange(fileName);
             ViewBag.MaxMinutes = maxMinutes;
             #endregion
-
             return Index(cameraPositions);
         }
 
-        //Reads a CSV file, converts each row into a CameraPosition and returns a list
         private List<CameraPosition> GetCameraPositionsFromCSV(string filePath)
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -109,6 +102,12 @@ namespace ICTCapstoneProject.Controllers
                 cameraPositions = csv.GetRecords<CameraPosition>().ToList();
             }
             return cameraPositions;
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

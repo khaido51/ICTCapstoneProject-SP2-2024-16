@@ -20,21 +20,22 @@
             height: 14px;
         }
 
-            [slider] > div > [inverse-left],
-            [slider] > div > [inverse-right] {
+            [slider] > div > [inverse-left] {
                 position: absolute;
+                left: 0;
                 height: 14px;
                 border-radius: 10px;
                 background-color: #CCC;
                 margin: 0 7px;
             }
 
-            [slider] > div > [inverse-left] {
-                left: 0;
-            }
-
             [slider] > div > [inverse-right] {
+                position: absolute;
                 right: 0;
+                height: 14px;
+                border-radius: 10px;
+                background-color: #CCC;
+                margin: 0 7px;
             }
 
             [slider] > div > [range] {
@@ -51,6 +52,7 @@
                 z-index: 2;
                 height: 28px;
                 width: 28px;
+                text-align: left;
                 margin-left: -11px;
                 cursor: pointer;
                 box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
@@ -67,91 +69,120 @@
             height: 14px;
             top: -2px;
             width: 100%;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+            filter: alpha(opacity=0);
+            -moz-opacity: 0;
+            -khtml-opacity: 0;
             opacity: 0;
         }
 
-            [slider] > input[type=range]::-webkit-slider-runnable-track,
-            [slider] > input[type=range]:focus {
-                background: transparent;
-                border: transparent;
-            }
+    div[slider] > input[type=range]::-ms-track {
+        -webkit-appearance: none;
+        background: transparent;
+        color: transparent;
+    }
 
-            [slider] > input[type=range]:focus {
-                outline: none;
-            }
+    div[slider] > input[type=range]::-moz-range-track {
+        -moz-appearance: none;
+        background: transparent;
+        color: transparent;
+    }
 
-            [slider] > input[type=range]::-ms-track,
-            [slider] > input[type=range]::-moz-range-track {
-                background: transparent;
-                color: transparent;
-            }
+    div[slider] > input[type=range]:focus::-webkit-slider-runnable-track {
+        background: transparent;
+        border: transparent;
+    }
 
-            [slider] > input[type=range]::-webkit-slider-thumb,
-            [slider] > input[type=range]::-ms-thumb,
-            [slider] > input[type=range]::-moz-range-thumb {
-                pointer-events: all;
-                width: 28px;
-                height: 28px;
-                background: red;
-                border: 0 none;
-                border-radius: 0;
-                -webkit-appearance: none;
-            }
+    div[slider] > input[type=range]:focus {
+        outline: none;
+    }
 
-        [slider] > div > [sign] {
-            opacity: 0;
+    div[slider] > input[type=range]::-ms-thumb {
+        pointer-events: all;
+        width: 28px;
+        height: 28px;
+        border-radius: 0px;
+        border: 0 none;
+        background: red;
+    }
+
+    div[slider] > input[type=range]::-moz-range-thumb {
+        pointer-events: all;
+        width: 28px;
+        height: 28px;
+        border-radius: 0px;
+        border: 0 none;
+        background: red;
+    }
+
+    div[slider] > input[type=range]::-webkit-slider-thumb {
+        pointer-events: all;
+        width: 28px;
+        height: 28px;
+        border-radius: 0px;
+        border: 0 none;
+        background: red;
+        -webkit-appearance: none;
+    }
+
+    div[slider] > input[type=range]::-ms-fill-lower {
+        background: transparent;
+        border: 0 none;
+    }
+
+    div[slider] > input[type=range]::-ms-fill-upper {
+        background: transparent;
+        border: 0 none;
+    }
+
+    div[slider] > input[type=range]::-ms-tooltip {
+        display: none;
+    }
+
+    [slider] > div > [sign] {
+        opacity: 0;
+        position: absolute;
+        margin-left: -11px;
+        top: -39px;
+        z-index: 3;
+        background-color: #1ABC9C;
+        color: #fff;
+        width: 28px;
+        height: 28px;
+        border-radius: 28px;
+        -webkit-border-radius: 28px;
+        align-items: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+        [slider] > div > [sign]:after {
             position: absolute;
-            margin-left: -11px;
-            top: -39px;
-            z-index: 3;
-            background-color: #1ABC9C;
-            color: #fff;
-            width: 28px;
-            height: 28px;
-            border-radius: 28px;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            content: '';
+            left: 0;
+            border-radius: 16px;
+            top: 19px;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top-width: 16px;
+            border-top-style: solid;
+            border-top-color: #1ABC9C;
         }
 
-            [slider] > div > [sign]:after {
-                position: absolute;
-                content: '';
-                left: 0;
-                border-radius: 16px;
-                top: 19px;
-                border-left: 14px solid transparent;
-                border-right: 14px solid transparent;
-                border-top: 16px solid #1ABC9C;
-            }
-
-            [slider] > div > [sign] > span {
-                font-size: 12px;
-                font-weight: 700;
-                line-height: 28px;
-            }
-
-        [slider]:hover > div > [sign] {
-            opacity: 1;
+        [slider] > div > [sign] > span {
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 28px;
         }
+
+    [slider]:hover > div > [sign] {
+        opacity: 1;
+    }
 
     th, td {
         font-size: 0.9em;
         padding: 8px;
-    }
-
-    .name-1 {
-        width: fit-content;
-        padding: 1rem 2rem 0.5rem 2rem;
-    }
-
-    .list-inline p {
-        font-size: 20px;
-        font-weight: 500;
-    }
-
-    .list-inline-item {
-        padding: 1rem 5rem 1rem 4rem;
     }
 
     .scene-name {
@@ -168,19 +199,19 @@
     }
 
     .form-check {
-        padding-left: 4rem;
+        padding-left: 4rem; /* Adjusted padding */
     }
 
     .graph-container {
         width: 100%;
-        height: 600px;
-        margin: 0 auto;
+        height: 500px;
+        margin: auto;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-</style>
 
+</style>
 <section id="participant">
     <div class="container mt-3 mb-2 px-4">
         <div class="row gx-4 justify-content-center">
@@ -190,7 +221,6 @@
         </div>
     </div>
 </section>
-
 <section id="scene">
     <div class="container px-4">
         <div class="row gx-4 justify-content-center">
@@ -205,6 +235,7 @@
                                 </label>
                             </div>
                         </div>
+
                         <div class="col-4 d-flex align-items-center justify-content-center">
                             <form method="post"
                                   id="uploadActiveForm"
@@ -233,25 +264,31 @@
     <div class="row justify-content-center">
         <div class="col-lg-4">
             <select id="graphSelector" class="form-select">
-                <option value="3D">3D graph (Camera Position & Velocity)</option>
-                <option value="Acceleration">Acceleration graphs (Camera Acceleration & Angular Velocity)</option>
-                <option value="Rotation">Rotation graphs (Camera Rotation & Angular Velocity)</option>
+                <option value="3D">3D graph(Camera Position & Velocity)</option>
+                <option value="Acceleration">Acceleration graphs(Camera Acceleration & Angular Velocity)</option>
+                <option value="Rotation">Rotation graphs(Camera Rotation & Angular Velocity)</option>
             </select>
         </div>
         <div class="col-lg-8">
-            <label><input type="radio" name="axis" class="radio" value="X" checked /> X</label>
-            <label><input type="radio" name="axis" class="radio" value="Y" /> Y</label>
-            <label><input type="radio" name="axis" class="radio" value="Z" /> Z</label>
+            <label>
+                <input type="radio" name="axis" class="radio" value="X" checked />X
+            </label>
+            <label>
+                <input type="radio" name="axis" class="radio" value="Y" />Y
+            </label>
+            <label>
+                <input type="radio" name="axis" class="radio" value="Z" />Z
+            </label>
         </div>
     </div>
 </div>
 
 <div id="plotlyGraph" class="graph-container" style="display: none;"></div>
 <div id="plotlyGraphAcceleration" class="graph-container" style="display: none;"></div>
+<div id="plotlyGraphAngularVelocity" class="graph-container" style="display: none;"></div>
 <div id="plotlyGraphRotationX" class="graph-container" style="display: none;"></div>
 <div id="plotlyGraphRotationY" class="graph-container" style="display: none;"></div>
 <div id="plotlyGraphRotationZ" class="graph-container" style="display: none;"></div>
-<div id="plotlyGraphAngularVelocity" class="graph-container" style="display: none;"></div>
 
 <div slider id="slider-distance">
     <div>
@@ -271,6 +308,7 @@
     <input type="range" tabindex="0" value="@ViewBag.MaxMinutes" max="@ViewBag.MaxMinutes" min="0" step="1" oninput="updateMaxSlider(this)" />
 </div>
 
+
 <div class="container px-4">
     <div class="row gx-4 justify-content-center">
         <div class="col-lg-10">
@@ -281,25 +319,33 @@
                             <th>Timestamp</th>
                             <th>Segment</th>
                             <th>Camera Active</th>
+
                             <th>Camera Position X</th>
                             <th>Camera Position Y</th>
                             <th>Camera Position Z</th>
-                            <th>Camera Rotation X</th>
-                            <th>Camera Rotation Y</th>
-                            <th>Camera Rotation Z</th>
-                            <th>Camera Rotation W</th>
-                            <th>Camera Velocity X</th>
-                            <th>Camera Velocity Y</th>
-                            <th>Camera Velocity Z</th>
-                            <th>Camera Acceleration X</th>
-                            <th>Camera Acceleration Y</th>
-                            <th>Camera Acceleration Z</th>
-                            <th>Camera Angular Velocity X</th>
-                            <th>Camera Angular Velocity Y</th>
-                            <th>Camera Angular Velocity Z</th>
-                            <th>Camera Angular Acceleration X</th>
-                            <th>Camera Angular Acceleration Y</th>
-                            <th>Camera Angular Acceleration Z</th>
+
+                            <th>CameraRotationX</th>
+                            <th>CameraRotationY</th>
+                            <th>CameraRotationZ</th>
+                            <th>CameraRotationW</th>
+
+                            <th>CameraVelocityX</th>
+                            <th>CameraVelocityY</th>
+                            <th>CameraVelocityZ</th>
+
+                            <th>CameraAccelerationX</th>
+                            <th>CameraAccelerationY</th>
+                            <th>CameraAccelerationZ</th>
+
+                            <th>CameraAngularVelocityX</th>
+                            <th>CameraAngularVelocityY</th>
+                            <th>CameraAngularVelocityZ</th>
+
+                            <th>CameraAngularAccelerationX</th>
+                            <th>CameraAngularAccelerationY</th>
+                            <th>CameraAngularAccelerationZ</th>
+
+                            <!-- Add other headers based on your model -->
                         </tr>
                     </thead>
                     <tbody>
@@ -310,22 +356,28 @@
                                 <td>@item.Timestamp</td>
                                 <td>@item.Segment</td>
                                 <td>@item.CameraActive</td>
+
                                 <td>@item.CameraPositionX</td>
                                 <td>@item.CameraPositionY</td>
                                 <td>@item.CameraPositionZ</td>
+
                                 <td>@item.CameraRotationX</td>
                                 <td>@item.CameraRotationY</td>
                                 <td>@item.CameraRotationZ</td>
                                 <td>@item.CameraRotationW</td>
+
                                 <td>@item.CameraVelocityX</td>
                                 <td>@item.CameraVelocityY</td>
                                 <td>@item.CameraVelocityZ</td>
+
                                 <td>@item.CameraAccelerationX</td>
                                 <td>@item.CameraAccelerationY</td>
                                 <td>@item.CameraAccelerationZ</td>
+
                                 <td>@item.CameraAngularVelocityX</td>
                                 <td>@item.CameraAngularVelocityY</td>
                                 <td>@item.CameraAngularVelocityZ</td>
+
                                 <td>@item.CameraAngularAccelerationX</td>
                                 <td>@item.CameraAngularAccelerationY</td>
                                 <td>@item.CameraAngularAccelerationZ</td>
@@ -341,6 +393,7 @@
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -363,7 +416,7 @@
                 y: yValues,
                 mode: 'lines+markers',
                 type: 'scatter',
-                line: {
+                line: { 
                     color: color,
                     width: 0.1,
                 },
@@ -380,6 +433,7 @@
                 yaxis: { title: yLabel },
                 margin: { l: 50, r: 50, b: 50, t: 50 }
             };
+
             Plotly.Plots.resize(elementId);
             Plotly.newPlot(elementId, traces, layout);
         }
@@ -419,7 +473,7 @@
                     yaxis: { title: 'Y Position (meters)' },
                     zaxis: { title: 'Z Position (meters)' }
                 },
-                margin: { l: 0, r: 0, b: 0, t: 0 }
+                margin: { l: 50, r: 50, b: 50, t: 50 }
             };
 
             Plotly.Plots.resize('plotlyGraph');
@@ -451,7 +505,6 @@
             }
 
             const trace = createGraphTrace(xValues, yValues, `Camera Acceleration ${axis}`, 'blue');
-
             renderGraph('plotlyGraphAcceleration', [trace], `Camera Acceleration ${axis} Over Time`, yLabel);
         }
 
@@ -480,7 +533,6 @@
             }
 
             const trace = createGraphTrace(xValues, yValues, `Camera Angular Velocity ${axis}`, 'red');
-
             renderGraph('plotlyGraphAngularVelocity', [trace], `Camera Angular Velocity ${axis} Over Time`, yLabel);
         }
 
@@ -597,7 +649,7 @@
             document.getElementById('plotlyGraph').style.display = 'block';
         });
 
-        // Display Data Table function
+        //Display Data Table function
         const totalRows = @Model.Count; // Total number of rows available
         let displayedRows = 10; // Rows displayed
 
@@ -641,4 +693,6 @@
             }
         });
     </script>
+
+
 }
