@@ -14,9 +14,11 @@ namespace ICTCapstoneProject.Controllers
 {
     public class CameraPositionController : Controller
     {
+        // Handle CSV field to nullable double values
+        // "NULL" as a null value.
         public class NullableDoubleConverter : DefaultTypeConverter
         {
-            public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+            public override object? ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
             {
                 // Check if the text is "NULL" and return null in that case.
                 if (string.Equals(text, "NULL", StringComparison.OrdinalIgnoreCase))
@@ -36,10 +38,12 @@ namespace ICTCapstoneProject.Controllers
             }
         }
 
+        // Calculates total range between the first and last timestamps in the CSV file.
         private int GetTotalMinutesRange(string filePath)
         {
             List<string> timestamps = new List<string>();
             using (var reader = new StreamReader(filePath))
+            // CultureInfo.InvariantCulture parse strings to dates format
             using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true }))
             {
                 csv.Read();
@@ -60,7 +64,7 @@ namespace ICTCapstoneProject.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(List<CameraPosition> cameraPositions = null)
+        public IActionResult Index(List<CameraPosition>? cameraPositions = null)
         {
             cameraPositions = cameraPositions == null ? new List<CameraPosition>() : cameraPositions;
             return View(cameraPositions);
