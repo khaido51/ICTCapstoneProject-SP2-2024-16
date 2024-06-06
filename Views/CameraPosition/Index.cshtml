@@ -1,6 +1,7 @@
 ﻿@model List<ICTCapstoneProject.Models.CameraPosition>
 
 @{
+    ViewData["Title"] = "Detecting of Onset Of Cysbersicknees using Physiological Cues";
     ViewData["Title2"] = "Camera Position Report";
 }
 
@@ -55,7 +56,6 @@
                 text-align: left;
                 margin-left: -11px;
                 cursor: pointer;
-                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
                 background-color: #FFF;
                 border-radius: 50%;
                 outline: none;
@@ -75,27 +75,6 @@
             -khtml-opacity: 0;
             opacity: 0;
         }
-
-    div[slider] > input[type=range]::-ms-track {
-        -webkit-appearance: none;
-        background: transparent;
-        color: transparent;
-    }
-
-    div[slider] > input[type=range]::-moz-range-track {
-        -moz-appearance: none;
-        background: transparent;
-        color: transparent;
-    }
-
-    div[slider] > input[type=range]:focus::-webkit-slider-runnable-track {
-        background: transparent;
-        border: transparent;
-    }
-
-    div[slider] > input[type=range]:focus {
-        outline: none;
-    }
 
     div[slider] > input[type=range]::-ms-thumb {
         pointer-events: all;
@@ -123,20 +102,6 @@
         border: 0 none;
         background: red;
         -webkit-appearance: none;
-    }
-
-    div[slider] > input[type=range]::-ms-fill-lower {
-        background: transparent;
-        border: 0 none;
-    }
-
-    div[slider] > input[type=range]::-ms-fill-upper {
-        background: transparent;
-        border: 0 none;
-    }
-
-    div[slider] > input[type=range]::-ms-tooltip {
-        display: none;
     }
 
     [slider] > div > [sign] {
@@ -199,7 +164,7 @@
     }
 
     .form-check {
-        padding-left: 4rem; /* Adjusted padding */
+        padding-left: 4rem;
     }
 
     .graph-container {
@@ -212,6 +177,7 @@
     }
 
 </style>
+
 <section id="participant">
     <div class="container mt-3 mb-2 px-4">
         <div class="row gx-4 justify-content-center">
@@ -230,7 +196,7 @@
                     <div class="row">
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <div class="form-check">
-                                <label class="form-check-label" for="active">
+                                <label class="form-check-label" for="uploadSimulatedIMUForm">
                                     SimulatedIMU
                                 </label>
                             </div>
@@ -238,7 +204,7 @@
 
                         <div class="col-4 d-flex align-items-center justify-content-center">
                             <form method="post"
-                                  id="uploadActiveForm"
+                                  id="uploadSimulatedIMUForm"
                                   enctype="multipart/form-data"
                                   asp-controller="CameraPosition"
                                   asp-action="Index">
@@ -249,7 +215,7 @@
                         </div>
                         <div class="col-2 d-flex align-items-center justify-content-center">
                             <input type="submit"
-                                   form="uploadActiveForm"
+                                   form="uploadSimulatedIMUForm"
                                    value="Upload File"
                                    class="btn btn-primary" />
                         </div>
@@ -290,7 +256,10 @@
 <div id="plotlyGraphRotationY" class="graph-container" style="display: none;"></div>
 <div id="plotlyGraphRotationZ" class="graph-container" style="display: none;"></div>
 
+
 <div slider id="slider-distance">
+
+    @*the second child of the parent element*@
     <div>
         <div inverse-left style="width:70%;"></div>
         <div inverse-right style="width:70%;"></div>
@@ -304,7 +273,10 @@
             <span id="value">@ViewBag.MaxMinutes</span>
         </div>
     </div>
+
+    @*input[0]*@
     <input type="range" tabindex="0" value="0" max="@ViewBag.MaxMinutes" min="0" step="1" oninput="updateMinSlider(this)" />
+    @*input[1]*@
     <input type="range" tabindex="0" value="@ViewBag.MaxMinutes" max="@ViewBag.MaxMinutes" min="0" step="1" oninput="updateMaxSlider(this)" />
 </div>
 
@@ -386,7 +358,7 @@
                         }
                     </tbody>
                 </table>
-                @if (Model.Count > 100)
+                @if (Model.Count > 10)
                 {
                     <button id="loadMore" class="btn btn-primary">Show More</button>
                 }
@@ -405,211 +377,42 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
+        // Fetch the Camera Position from Controller
         const modelData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+
         let filteredDataCache = {}; // Cache for filtered data
+        
         let debounceTimeout; // Debounce timeout
 
+
+        //Display Data Table function
+
+        const totalRows = @Model.Count; // Total number of rows available
+
+        let displayedRows = 10; // Rows displayed
+
+        /**
+        * <summary>
+        * This function improves performance 
+        * by limiting the speed at which functions are called
+        * 
+        * Create a debounced version of function
+        * Delays execution until a wait time has passed after being called
+        * </summary>
+        * <param name="func"> Function to debounce = optimizedFilterGraphData </param>
+        * <param name="wait"> The time in "milliseconds" = 300 </param>
+        * <returns>
+        * A debounced version of the given function that delays its execution
+        * </returns>
+        * <link>https://www.freecodecamp.org/news/javascript-debounce-example/</link>
+        */
         function debounce(func, wait) {
             return function (...args) {
+                // Reset timer
                 clearTimeout(debounceTimeout);
+                // after finish the Set timer, excute the function
                 debounceTimeout = setTimeout(() => func.apply(this, args), wait);
             };
-        }
-
-        function createGraphTrace(xValues, yValues, axisLabel, color) {
-            return {
-                x: xValues,
-                y: yValues,
-                mode: 'lines+markers',
-                type: 'scatter',
-                line: { 
-                    color: color,
-                    width: 0.1,
-                },
-                name: axisLabel,
-                marker: { size: 1 },
-            };
-        }
-
-        function renderGraph(elementId, traces, title, yLabel) {
-            const layout = {
-                title: title,
-                autosize: true,
-                xaxis: { title: 'Time' },
-                yaxis: { title: yLabel },
-                margin: { l: 50, r: 50, b: 50, t: 50 }
-            };
-
-            Plotly.Plots.resize(elementId);
-            Plotly.newPlot(elementId, traces, layout);
-        }
-
-        //CameraPosition 3D graph
-        function renderPlotlyGraph(cameraPositions) {
-            const xValues = cameraPositions.map(p => p.CameraPositionX);
-            const yValues = cameraPositions.map(p => p.CameraPositionZ);
-            const zValues = cameraPositions.map(p => p.CameraPositionY);
-            const velocityMagnitudes = cameraPositions.map(p => Math.sqrt(p.CameraVelocityX ** 2 + p.CameraVelocityY ** 2 + p.CameraVelocityZ ** 2));
-
-            const trace = {
-                x: xValues,
-                y: yValues,
-                z: zValues,
-                mode: 'lines+markers',
-                type: 'scatter3d',
-                marker: {
-                    size: 1,
-                    color: velocityMagnitudes,
-                    colorscale: 'Viridis',
-                    colorbar: { title: 'Speed' },
-                    opacity: 0.8
-                },
-                line: {
-                    color: velocityMagnitudes,
-                    colorscale: 'Viridis',
-                    width: 6
-                }
-            };
-
-            const layout = {
-                title: '3D Trajectory of Camera with Velocity Color Coding',
-                autosize: true,
-                scene: {
-                    xaxis: { title: 'X Position (meters)' },
-                    yaxis: { title: 'Y Position (meters)' },
-                    zaxis: { title: 'Z Position (meters)' }
-                },
-                margin: { l: 50, r: 50, b: 50, t: 50 }
-            };
-
-            Plotly.Plots.resize('plotlyGraph');
-            Plotly.newPlot('plotlyGraph', [trace], layout);
-        }
-
-        function renderCameraAccelerationGraph(cameraPositions, axis) {
-            const xValues = cameraPositions.map(p => p.Timestamp);
-            let yValues;
-            let yLabel;
-
-            switch (axis) {
-                case 'X':
-                    yValues = cameraPositions.map(p => p.CameraAccelerationX);
-                    yLabel = 'Acceleration X (m/s²)';
-                    break;
-                case 'Y':
-                    yValues = cameraPositions.map(p => p.CameraAccelerationY);
-                    yLabel = 'Acceleration Y (m/s²)';
-                    break;
-                case 'Z':
-                    yValues = cameraPositions.map(p => p.CameraAccelerationZ);
-                    yLabel = 'Acceleration Z (m/s²)';
-                    break;
-                default:
-                    yValues = cameraPositions.map(p => p.CameraAccelerationX);
-                    yLabel = 'Acceleration X (m/s²)';
-                    break;
-            }
-
-            const trace = createGraphTrace(xValues, yValues, `Camera Acceleration ${axis}`, 'blue');
-            renderGraph('plotlyGraphAcceleration', [trace], `Camera Acceleration ${axis} Over Time`, yLabel);
-        }
-
-        function renderCameraAngularVelocityGraph(cameraPositions, axis) {
-            const xValues = cameraPositions.map(p => p.Timestamp);
-            let yValues;
-            let yLabel;
-
-            switch (axis) {
-                case 'X':
-                    yValues = cameraPositions.map(p => p.CameraAngularVelocityX);
-                    yLabel = 'Angular Velocity X (rad/s)';
-                    break;
-                case 'Y':
-                    yValues = cameraPositions.map(p => p.CameraAngularVelocityY);
-                    yLabel = 'Angular Velocity Y (rad/s)';
-                    break;
-                case 'Z':
-                    yValues = cameraPositions.map(p => p.CameraAngularVelocityZ);
-                    yLabel = 'Angular Velocity Z (rad/s)';
-                    break;
-                default:
-                    yValues = cameraPositions.map(p => p.CameraAngularVelocityX);
-                    yLabel = 'Angular Velocity X (rad/s)';
-                    break;
-            }
-
-            const trace = createGraphTrace(xValues, yValues, `Camera Angular Velocity ${axis}`, 'red');
-            renderGraph('plotlyGraphAngularVelocity', [trace], `Camera Angular Velocity ${axis} Over Time`, yLabel);
-        }
-
-        function renderCameraRotationGraph(cameraPositions) {
-            const xValues = cameraPositions.map(p => p.Timestamp);
-            const yValuesX = cameraPositions.map(p => p.CameraRotationX);
-            const yValuesY = cameraPositions.map(p => p.CameraRotationY);
-            const yValuesZ = cameraPositions.map(p => p.CameraRotationZ);
-
-            const traceX = createGraphTrace(xValues, yValuesX, 'Camera Rotation X (quaternion)', 'purple');
-            const traceY = createGraphTrace(xValues, yValuesY, 'Camera Rotation Y (quaternion)', 'green');
-            const traceZ = createGraphTrace(xValues, yValuesZ, 'Camera Rotation Z (quaternion)', 'blue');
-
-            renderGraph('plotlyGraphRotationX', [traceX], 'Camera Rotation X Over Time', 'Rotation X (quaternion)');
-            renderGraph('plotlyGraphRotationY', [traceY], 'Camera Rotation Y Over Time', 'Rotation Y (quaternion)');
-            renderGraph('plotlyGraphRotationZ', [traceZ], 'Camera Rotation Z Over Time', 'Rotation Z (quaternion)');
-        }
-
-        //Time Range Slider
-        function updateMinSlider(input) {
-            var maxInput = input.parentNode.getElementsByTagName('input')[1];
-            if (parseInt(input.value) >= parseInt(maxInput.value)) {
-                input.value = parseInt(maxInput.value) - 1;
-            }
-            updateSliderDisplay(input);
-            optimizedFilterGraphData();
-        }
-
-        function updateMaxSlider(input) {
-            var minInput = input.parentNode.getElementsByTagName('input')[0];
-            if (parseInt(input.value) <= parseInt(minInput.value)) {
-                input.value = parseInt(minInput.value) + 1;
-            }
-            updateSliderDisplay(input);
-            optimizedFilterGraphData();
-        }
-
-        function updateSliderDisplay(input) {
-            const value = (100 / (parseInt(input.max) - parseInt(input.min))) * parseInt(input.value) - (100 / (parseInt(input.max) - parseInt(input.min))) * parseInt(input.min);
-            const children = input.parentNode.childNodes[1].childNodes;
-            if (input === input.parentNode.getElementsByTagName('input')[0]) {
-                children[1].style.width = value + '%';
-                children[5].style.left = value + '%';
-                children[7].style.left = value + '%';
-                children[11].style.left = value + '%';
-                children[11].childNodes[1].innerHTML = input.value;
-            } else {
-                children[3].style.width = (100 - value) + '%';
-                children[5].style.right = (100 - value) + '%';
-                children[9].style.left = value + '%';
-                children[13].style.left = value + '%';
-                children[13].childNodes[1].innerHTML = input.value;
-            }
-        }
-
-        function filterGraphData() {
-            const minSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[0].value);
-            const maxSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[1].value);
-            const cacheKey = `${minSliderValue}-${maxSliderValue}`;
-
-            if (filteredDataCache[cacheKey]) {
-                return filteredDataCache[cacheKey];
-            }
-
-            const filteredData = modelData.filter(p => {
-                const minutes = (new Date(p.Timestamp) - new Date(modelData[0].Timestamp)) / 60000;
-                return minutes >= minSliderValue && minutes <= maxSliderValue;
-            });
-
-            filteredDataCache[cacheKey] = filteredData;
-            return filteredData;
         }
 
         const optimizedFilterGraphData = debounce(() => {
@@ -644,61 +447,370 @@
         }, 300);
 
         document.addEventListener("DOMContentLoaded", function () {
-            renderPlotlyGraph(modelData);
+            const graphSelector = document.getElementById("graphSelector");
+            const axisRadios = document.querySelectorAll('input[name="axis"]');
+            const plotlyGraph = document.getElementById("plotlyGraph");
+            const loadMoreButton = document.getElementById("loadMore");
 
-            document.getElementById("graphSelector").addEventListener("change", optimizedFilterGraphData);
-            document.querySelectorAll('input[name="axis"]').forEach((radio) => {
-                radio.addEventListener("change", optimizedFilterGraphData);
+            if (graphSelector && axisRadios.length > 0 && plotlyGraph) {
+                graphSelector.addEventListener("change", optimizedFilterGraphData);
+                axisRadios.forEach((radio) => {
+                    radio.addEventListener("change", optimizedFilterGraphData);
+                });
+
+                plotlyGraph.style.display = 'block';
+                renderPlotlyGraph(modelData);
+            } else {
+                console.error("Cannot find required DOM elements");
+            }
+
+            if (totalRows >= displayedRows) {
+                loadMoreButton.addEventListener("click", function () {
+                    const tableBody = document.getElementById("cameraPositionsTable").getElementsByTagName("tbody")[0];
+                    const rowsToAdd = Math.min(displayedRows + 10, totalRows); // New target number of rows to display
+
+                    for (let i = displayedRows; i < rowsToAdd; i++) {
+                        const item = modelData[i];
+                        const row = tableBody.insertRow();
+
+                        row.innerHTML = `
+                            <td>${item.Timestamp}</td>
+                            <td>${item.Segment}</td>
+                            <td>${item.CameraActive}</td>
+                            <td>${item.CameraPositionX}</td>
+                            <td>${item.CameraPositionY}</td>
+                            <td>${item.CameraPositionZ}</td>
+                            <td>${item.CameraRotationX}</td>
+                            <td>${item.CameraRotationY}</td>
+                            <td>${item.CameraRotationZ}</td>
+                            <td>${item.CameraRotationW}</td>
+                            <td>${item.CameraVelocityX}</td>
+                            <td>${item.CameraVelocityY}</td>
+                            <td>${item.CameraVelocityZ}</td>
+                            <td>${item.CameraAccelerationX}</td>
+                            <td>${item.CameraAccelerationY}</td>
+                            <td>${item.CameraAccelerationZ}</td>
+                            <td>${item.CameraAngularVelocityX}</td>
+                            <td>${item.CameraAngularVelocityY}</td>
+                            <td>${item.CameraAngularVelocityZ}</td>
+                            <td>${item.CameraAngularAccelerationX}</td>
+                            <td>${item.CameraAngularAccelerationY}</td>
+                            <td>${item.CameraAngularAccelerationZ}</td>
+                        `;
+                    }
+
+                    displayedRows = rowsToAdd;
+                    if (displayedRows >= totalRows) {
+                        loadMoreButton.style.display = "none";
+                    }
+                });
+            }
+        });
+
+        /**
+        * <summary>
+        * Creates a 2D graph trace object for plotting with Plotly
+        * Configured with the given x/y values, axis label, and color
+        * </summary>
+        * <param name="xValues"> Array of x-axis values for the plot</param>
+        * <param name="yValues"> Array of y-axis values for the plot</param>
+        * <param name="axisLabel"> String label for the axis, used as the trace name</param>
+        * <param name="color"> Color of the line in the plot</param>
+        * <returns>
+        * Return object representing the configuration of a Plotly trace
+        * </returns>
+        */
+        function createGraphTrace(xValues, yValues, axisLabel, color) {
+            return {
+                // Array
+                x: xValues,
+                y: yValues,
+
+                mode: 'lines+markers',
+                type: 'scatter',
+                line: { 
+                    color: color,
+                    width: 0.3,
+                },
+                name: axisLabel,
+                // Size of points
+                marker: { size: 1 },
+            };
+        }
+
+        /**
+        * <summary>
+        * Render a Plotly graph in a specified HTML element with given traces, title, and y-axis label
+        * Configure the layout of the graph, including the title, axis labels, and margins.
+        * </summary>
+        * <param name="elementId"> Id of the html element where the graph will be rendered.</param>
+        * <param name="traces"> Array of trace objects</param>
+        * <param name="title"> Title of the graph</param>
+        * <param name="yLabel"> The label for the y-axis of the graph</param>
+        * <returns></returns>
+        */
+        function renderGraph(elementId, traces, title, yLabel) {
+            const layout = {
+                title: title,
+                autosize: true,
+                xaxis: { title: 'Time' },
+                yaxis: { title: yLabel },
+                margin: { l: 50, r: 50, b: 50, t: 50 }
+            };
+
+            Plotly.Plots.resize(elementId);
+            Plotly.newPlot(elementId, traces, layout);
+        }
+
+        /**
+        * <summary>
+        * Renders a 3D Camera Position graph with velocity color coding.
+        * Maps the camera positions and velocities to a 3D scatter plot, and configures the graph layout
+        * </summary>
+        * <param name="cameraPositions"> Array of Camera Position objects </param>
+        * <returns></returns>
+        * <link>https://en.wikipedia.org/wiki/Velocity for 3-dimensional velocity</link>
+        */
+        function renderPlotlyGraph(cameraPositions) {
+
+            const plotlyGraph = document.getElementById('plotlyGraph');
+            
+            if (plotlyGraph && plotlyGraph.style.display !== 'none') {
+                const xValues = cameraPositions.map(p => p.CameraPositionX);
+                const yValues = cameraPositions.map(p => p.CameraPositionZ);
+                const zValues = cameraPositions.map(p => p.CameraPositionY);
+
+                // magnitude of the velocity = Square root of the sum of the square of the X,Y,Z velocity
+                const velocityMagnitudes = cameraPositions.map(p => Math.sqrt(p.CameraVelocityX ** 2 + p.CameraVelocityY ** 2 + p.CameraVelocityZ ** 2));
+
+                const trace = {
+                    x: xValues,
+                    y: yValues,
+                    z: zValues,
+                    mode: 'lines+markers',
+                    type: 'scatter3d',
+                    marker: {
+                        size: 1,
+                        color: velocityMagnitudes,
+                        colorscale: 'Viridis',
+                        colorbar: { title: 'Speed' },
+                        opacity: 0.8
+                    },
+                    line: {
+                        color: velocityMagnitudes,
+                        colorscale: 'Viridis',
+                        width: 5
+                    }
+                };
+
+                const layout = {
+                    title: '3D Trajectory of Camera with Velocity Color Coding',
+                    autosize: true,
+                    scene: {
+                        xaxis: { title: 'X Position (meters)' },
+                        yaxis: { title: 'Y Position (meters)' },
+                        zaxis: { title: 'Z Position (meters)' }
+                    },
+                    margin: { l: 50, r: 50, b: 50, t: 50 }
+                };
+
+                Plotly.newPlot('plotlyGraph', [trace], layout);
+                Plotly.Plots.resize('plotlyGraph');
+            } else {
+                console.error("Plotly elements cannot find or not shown")
+            }
+        }
+
+        // Render Acceleration graph
+        function renderCameraAccelerationGraph(cameraPositions, axis) {
+            const xValues = cameraPositions.map(p => p.Timestamp);
+            let yValues;
+            let yLabel;
+
+            switch (axis) {
+                case 'X':
+                    yValues = cameraPositions.map(p => p.CameraAccelerationX);
+                    yLabel = 'Acceleration X (m/s²)';
+                    break;
+                case 'Y':
+                    yValues = cameraPositions.map(p => p.CameraAccelerationY);
+                    yLabel = 'Acceleration Y (m/s²)';
+                    break;
+                case 'Z':
+                    yValues = cameraPositions.map(p => p.CameraAccelerationZ);
+                    yLabel = 'Acceleration Z (m/s²)';
+                    break;
+                default:
+                    yValues = cameraPositions.map(p => p.CameraAccelerationX);
+                    yLabel = 'Acceleration X (m/s²)';
+                    break;
+            }
+
+            const trace = createGraphTrace(xValues, yValues, `Camera Acceleration ${axis}`, 'blue');
+            renderGraph('plotlyGraphAcceleration', [trace], `Camera Acceleration ${axis} Over Time`, yLabel);
+        }
+
+        // Render Angular Velocity graph
+        function renderCameraAngularVelocityGraph(cameraPositions, axis) {
+            const xValues = cameraPositions.map(p => p.Timestamp);
+            let yValues;
+            let yLabel;
+
+            switch (axis) {
+                case 'X':
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityX);
+                    yLabel = 'Angular Velocity X (rad/s)';
+                    break;
+                case 'Y':
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityY);
+                    yLabel = 'Angular Velocity Y (rad/s)';
+                    break;
+                case 'Z':
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityZ);
+                    yLabel = 'Angular Velocity Z (rad/s)';
+                    break;
+                default:
+                    yValues = cameraPositions.map(p => p.CameraAngularVelocityX);
+                    yLabel = 'Angular Velocity X (rad/s)';
+                    break;
+            }
+
+            const trace = createGraphTrace(xValues, yValues, `Camera Angular Velocity ${axis}`, 'red');
+            renderGraph('plotlyGraphAngularVelocity', [trace], `Camera Angular Velocity ${axis} Over Time`, yLabel);
+        }
+
+        // Render Rotation graph
+        function renderCameraRotationGraph(cameraPositions) {
+            const xValues = cameraPositions.map(p => p.Timestamp);
+            const yValuesX = cameraPositions.map(p => p.CameraRotationX);
+            const yValuesY = cameraPositions.map(p => p.CameraRotationY);
+            const yValuesZ = cameraPositions.map(p => p.CameraRotationZ);
+
+            const traceX = createGraphTrace(xValues, yValuesX, 'Camera Rotation X (quaternion)', 'purple');
+            const traceY = createGraphTrace(xValues, yValuesY, 'Camera Rotation Y (quaternion)', 'green');
+            const traceZ = createGraphTrace(xValues, yValuesZ, 'Camera Rotation Z (quaternion)', 'blue');
+
+            renderGraph('plotlyGraphRotationX', [traceX], 'Camera Rotation X Over Time', 'Rotation X (quaternion)');
+            renderGraph('plotlyGraphRotationY', [traceY], 'Camera Rotation Y Over Time', 'Rotation Y (quaternion)');
+            renderGraph('plotlyGraphRotationZ', [traceZ], 'Camera Rotation Z Over Time', 'Rotation Z (quaternion)');
+        }
+
+        
+        // Time Range slider
+
+        /**
+        * <summary>
+        * Updates the value of the minimum range slider
+        * and ensures it doesn't exceed the max slider's value
+        * </summary>
+        * <param name="input"> Input the minimum range slider element </param>
+        * <returns>None. Update the slider value, display, and filter the graph data</returns>
+        */
+        function updateMinSlider(input) {
+
+            // Get the maximum slider input element
+            var maxInput = input.parentNode.getElementsByTagName('input')[1];
+
+            // Don't exceed the maximum slider's value
+            if (parseInt(input.value) >= parseInt(maxInput.value)) {
+                input.value = parseInt(maxInput.value) - 1;
+            }
+
+            // Update slider display to reflect the new min value
+            updateSliderDisplay(input);
+
+            // Filter and update graph based on the new range
+            optimizedFilterGraphData();
+        }
+
+        /**
+        * <summary>
+        * Updates the value of the maximum range slider
+        * and ensures it doesn't exceed min slider's value
+        * </summary>
+        * <param name="input"> Input the maximum range slider element </param>
+        * <returns>None. Updates the slider value, display, and filter the graph data </returns>
+        */
+        function updateMaxSlider(input) {
+
+            // Get the minimum slider input element
+            var minInput = input.parentNode.getElementsByTagName('input')[0];
+
+            // Ensure the maximum slider's value does not go below the minimum slider's value
+            if (parseInt(input.value) <= parseInt(minInput.value)) {
+                input.value = parseInt(minInput.value) + 1;
+            }
+
+            // Update slider display to reflect the new max value
+            updateSliderDisplay(input);
+
+            // Filter and update graph based on the new range
+            optimizedFilterGraphData();
+        }
+
+
+        /**
+        * <summary>
+        * Updates slider display based on the new value
+        * Adjust elements to reflect the new value
+        * </summary>
+        * <param name="input"> Input range slider element (Max/Min) </param>
+        * <returns>None. Update the slider's display </returns>
+        * <link>https://codepen.io/glitchworker/pen/XVdKqj
+        * Time range slider's css elements and html structure are also cited
+        * </link>
+        */
+        function updateSliderDisplay(input) {
+            // Calculate the value as % of the Total range
+            const value = (100 / (parseInt(input.max) - parseInt(input.min))) * parseInt(input.value) - (100 / (parseInt(input.max) - parseInt(input.min))) * parseInt(input.min);
+
+            // Get child elements of the slider container <div slider>
+            const children = input.parentNode.childNodes[1].childNodes;
+
+            // Check if input = min slider
+            if (input === input.parentNode.getElementsByTagName('input')[0]) {
+                // inverse-left width
+                children[1].style.width = value + '%';
+                // range left position
+                children[5].style.left = value + '%';
+                // thumb left position
+                children[7].style.left = value + '%';
+                // sign left position
+                children[11].style.left = value + '%';
+                // Update value to match the new value
+                children[11].childNodes[1].innerHTML = input.value;
+            } else {
+                // inverse-right width
+                children[3].style.width = (100 - value) + '%';
+                // range right position
+                children[5].style.right = (100 - value) + '%';
+                // thumb left position
+                children[9].style.left = value + '%';
+                // sign left position
+                children[13].style.left = value + '%';
+                // Update value to match the new value
+                children[13].childNodes[1].innerHTML = input.value;
+            }
+        }
+
+
+        function filterGraphData() {
+            const minSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[0].value);
+            const maxSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[1].value);
+            const cacheKey = `${minSliderValue}-${maxSliderValue}`;
+
+            if (filteredDataCache[cacheKey]) {
+                return filteredDataCache[cacheKey];
+            }
+
+            const filteredData = modelData.filter(p => {
+                const minutes = (new Date(p.Timestamp) - new Date(modelData[0].Timestamp)) / 60000;
+                return minutes >= minSliderValue && minutes <= maxSliderValue;
             });
 
-            // Initially render 3D graph with the default axis
-            document.getElementById('plotlyGraph').style.display = 'block';
-        });
+            filteredDataCache[cacheKey] = filteredData;
+            return filteredData;
+        }
 
-        //Display Data Table function
-        const totalRows = @Model.Count; // Total number of rows available
-        let displayedRows = 10; // Rows displayed
-
-        document.getElementById("loadMore").addEventListener("click", function () {
-            const tableBody = document.getElementById("cameraPositionsTable").getElementsByTagName("tbody")[0];
-            const rowsToAdd = Math.min(displayedRows + 10, totalRows); // New target number of rows to display
-
-            for (let i = displayedRows; i < rowsToAdd; i++) {
-                const item = modelData[i];
-                const row = tableBody.insertRow();
-
-                row.innerHTML = `
-                    <td>${item.Timestamp}</td>
-                    <td>${item.Segment}</td>
-                    <td>${item.CameraActive}</td>
-                    <td>${item.CameraPositionX}</td>
-                    <td>${item.CameraPositionY}</td>
-                    <td>${item.CameraPositionZ}</td>
-                    <td>${item.CameraRotationX}</td>
-                    <td>${item.CameraRotationY}</td>
-                    <td>${item.CameraRotationZ}</td>
-                    <td>${item.CameraRotationW}</td>
-                    <td>${item.CameraVelocityX}</td>
-                    <td>${item.CameraVelocityY}</td>
-                    <td>${item.CameraVelocityZ}</td>
-                    <td>${item.CameraAccelerationX}</td>
-                    <td>${item.CameraAccelerationY}</td>
-                    <td>${item.CameraAccelerationZ}</td>
-                    <td>${item.CameraAngularVelocityX}</td>
-                    <td>${item.CameraAngularVelocityY}</td>
-                    <td>${item.CameraAngularVelocityZ}</td>
-                    <td>${item.CameraAngularAccelerationX}</td>
-                    <td>${item.CameraAngularAccelerationY}</td>
-                    <td>${item.CameraAngularAccelerationZ}</td>
-                `;
-            }
-
-            displayedRows = rowsToAdd;
-            if (displayedRows >= totalRows) {
-                document.getElementById("loadMore").style.display = "none";
-            }
-        });
     </script>
-
-
 }
