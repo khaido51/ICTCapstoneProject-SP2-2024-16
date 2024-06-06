@@ -380,7 +380,7 @@
         // Fetch the Camera Position from Controller
         const modelData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
 
-        let filteredDataCache = {}; // Cache for filtered data
+        let filteredDataCache = {}; // Cache for filtered data, use in filterGraphData()
         
         let debounceTimeout; // Debounce timeout
 
@@ -415,9 +415,21 @@
             };
         }
 
+        /**
+        * <summary>
+        * Filter graph data
+        * Update displayed graph based on the selected graph type and axis
+        * Uses a debounced function to prevent excessive filtering and rendering during rapid slider movements.
+        * </summary>
+        * <param name=""></param>
+        * <returns>None. Updates the displayed graph directly</returns>
+        */
         const optimizedFilterGraphData = debounce(() => {
+            // Filter data based on the curernt slider values
             const filteredData = filterGraphData();
+            // Get selected graph type from the dropdown
             const selectedGraph = document.getElementById("graphSelector").value;
+            // Get selected axix from check box
             const selectedAxis = document.querySelector('input[name="axis"]:checked').value;
 
             // Hide all graphs
@@ -428,6 +440,7 @@
             document.getElementById('plotlyGraphRotationY').style.display = 'none';
             document.getElementById('plotlyGraphRotationZ').style.display = 'none';
 
+            // Show and render the appropriate graphs based on the selected graph type
             if (selectedGraph === "Acceleration") {
                 renderCameraAccelerationGraph(filteredData, selectedAxis);
                 renderCameraAngularVelocityGraph(filteredData, selectedAxis);
@@ -446,33 +459,52 @@
             }
         }, 300);
 
+        /**
+        * <summary>
+        * Initialize the event listeners 
+        * Set up the initial state for the graph and data table when the DOM is fully loaded
+        * </summary>
+        */
         document.addEventListener("DOMContentLoaded", function () {
+            // Get references to the DOM elements
             const graphSelector = document.getElementById("graphSelector");
             const axisRadios = document.querySelectorAll('input[name="axis"]');
             const plotlyGraph = document.getElementById("plotlyGraph");
             const loadMoreButton = document.getElementById("loadMore");
 
+            // Check if DOM elements are found
             if (graphSelector && axisRadios.length > 0 && plotlyGraph) {
+
+                // Add change event listeners to the graph selector dropdown
                 graphSelector.addEventListener("change", optimizedFilterGraphData);
+
+                // Add change event listeners to the each axis radio button
                 axisRadios.forEach((radio) => {
                     radio.addEventListener("change", optimizedFilterGraphData);
                 });
 
+                // Display Initial 3D graph
                 plotlyGraph.style.display = 'block';
                 renderPlotlyGraph(modelData);
+
             } else {
                 console.error("Cannot find required DOM elements");
             }
 
             if (totalRows >= displayedRows) {
+                // Add click event listener to "Load More" button
                 loadMoreButton.addEventListener("click", function () {
+                    // Get table body element to insert new rows
                     const tableBody = document.getElementById("cameraPositionsTable").getElementsByTagName("tbody")[0];
-                    const rowsToAdd = Math.min(displayedRows + 10, totalRows); // New target number of rows to display
+                    // New target number of rows to display
+                    const rowsToAdd = Math.min(displayedRows + 10, totalRows);
 
+                    // Insert new rows into the table
                     for (let i = displayedRows; i < rowsToAdd; i++) {
                         const item = modelData[i];
                         const row = tableBody.insertRow();
 
+                        // Add the data cells to the new row
                         row.innerHTML = `
                             <td>${item.Timestamp}</td>
                             <td>${item.Segment}</td>
@@ -499,7 +531,10 @@
                         `;
                     }
 
+                    // Update the number of displayed rows
                     displayedRows = rowsToAdd;
+
+                    // Hide the "Load More" button if all rows are displayed
                     if (displayedRows >= totalRows) {
                         loadMoreButton.style.display = "none";
                     }
@@ -793,22 +828,42 @@
             }
         }
 
-
+        /**
+        * <summary>
+        * Filters the graph data based on the current values of the minimum and maximum range sliders.
+        * Retrieves the current slider values, checks if the filtered data is already cached, and if not,
+        * filters the data according to the specified range. The filtered data is then cached for future use.
+        * </summary>
+        * <param name=""></param>
+        * <returns>
+        * Return Array of filtered data points within the specified time range
+        * </returns>
+        */
         function filterGraphData() {
+            // Get the current values of Min/Max time range slider
             const minSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[0].value);
             const maxSliderValue = parseInt(document.getElementById('slider-distance').getElementsByTagName('input')[1].value);
+            
+            // Create string cache key for time range
             const cacheKey = `${minSliderValue}-${maxSliderValue}`;
 
+            // Check if filtered data for the range is already cached
             if (filteredDataCache[cacheKey]) {
+                // Return the cached data if available
                 return filteredDataCache[cacheKey];
             }
 
+            // Filter data based on time range
             const filteredData = modelData.filter(p => {
+                // Calculate time difference in minutes from first timestamp (convert the milliseconds to minutes / 6000)
                 const minutes = (new Date(p.Timestamp) - new Date(modelData[0].Timestamp)) / 60000;
+                // Inclue data points within the slider's range
                 return minutes >= minSliderValue && minutes <= maxSliderValue;
             });
 
+            // Cache the filtered data for next use
             filteredDataCache[cacheKey] = filteredData;
+
             return filteredData;
         }
 
