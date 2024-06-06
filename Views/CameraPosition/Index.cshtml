@@ -69,20 +69,17 @@
             height: 14px;
             top: -2px;
             width: 100%;
-            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-            filter: alpha(opacity=0);
-            -moz-opacity: 0;
-            -khtml-opacity: 0;
             opacity: 0;
         }
 
-    div[slider] > input[type=range]::-ms-thumb {
+    div[slider] > input[type=range]::-webkit-slider-thumb {
         pointer-events: all;
         width: 28px;
         height: 28px;
         border-radius: 0px;
         border: 0 none;
         background: red;
+        -webkit-appearance: none;
     }
 
     div[slider] > input[type=range]::-moz-range-thumb {
@@ -94,14 +91,13 @@
         background: red;
     }
 
-    div[slider] > input[type=range]::-webkit-slider-thumb {
+    div[slider] > input[type=range]::-ms-thumb {
         pointer-events: all;
         width: 28px;
         height: 28px;
         border-radius: 0px;
         border: 0 none;
         background: red;
-        -webkit-appearance: none;
     }
 
     [slider] > div > [sign] {
@@ -193,10 +189,10 @@
             <div class="col-lg-8">
                 <div class="scene-name"><p>Scene</p></div>
                 <div class="container cont-2">
-                    <div class="row">
-                        <div class="col-2 d-flex align-items-center justify-content-center">
+                    <div class="row align-items-center">
+                        <div class="col-3 d-flex align-items-center justify-content-center">
                             <div class="form-check">
-                                <label class="form-check-label" for="uploadSimulatedIMUForm">
+                                <label class="form-check-label" for="fileInput">
                                     SimulatedIMU
                                 </label>
                             </div>
@@ -209,7 +205,7 @@
                                   asp-controller="CameraPosition"
                                   asp-action="Index">
                                 <div class="col-md-auto d-flex align-items-center justify-content-center">
-                                    <input type="file" name="file" class="form-control" />
+                                    <input type="file" name="file" id="fileInput" class="form-control" />
                                 </div>
                             </form>
                         </div>
