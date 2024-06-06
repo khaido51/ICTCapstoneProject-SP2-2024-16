@@ -143,22 +143,27 @@
         const legend = svg.append("g")
             .attr("transform", `translate(${width - 100}, -60)`);
 
+        // Define a color scale
         const color = d3.scaleOrdinal()
             .domain(["Baseline", "Passive", "Active"])
             .range(["red", "blue", "green"]);
 
+        // Select and create legend items for each scene type
         const legendItems = legend.selectAll(".legend-item")
             .data(color.domain())
             .enter().append("g")
             .attr("class", "legend-item")
             .attr("transform", (d, i) => `translate(0, ${i * 20})`);
 
+        // Append colored rectangle
         legendItems.append("rect")
             .attr("x", 0)
             .attr("width", 18)
             .attr("height", 18)
+            // fill the color based on specific scene type
             .style("fill", color);
 
+        // Append text labels to each legend item
         legendItems.append("text")
             .attr("x", 24)
             .attr("y", 9)
