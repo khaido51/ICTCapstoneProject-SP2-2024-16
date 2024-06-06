@@ -9,6 +9,7 @@ using CsvHelper.TypeConversion;
 using System.IO;
 using System;
 using System.Globalization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ICTCapstoneProject.Controllers
 {
@@ -71,23 +72,59 @@ namespace ICTCapstoneProject.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(IFormFile file, [FromServices] IWebHostEnvironment hostingEnvironment)
+        public IActionResult Index(IFormFile file)
         {
 
             #region Upload CameraPosition CSV file
-            string fileName = $"{hostingEnvironment.WebRootPath}\\files\\{file.FileName}";
-            using (FileStream fileStream = System.IO.File.Create(fileName))
+            var fileName = Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
+            using (var stream = System.IO.File.Create(filePath))
             {
-                file.CopyTo(fileStream);
-                fileStream.Flush();
+                file.CopyTo(stream);
+                
             }
 
-            var cameraPositions = GetCameraPositionsFromCSV(fileName);
+            var error = this.validatesFile(fileName);
+            if (!string.IsNullOrEmpty(error))
+            {
+                TempData["Message"] = error;
+                System.IO.File.Delete(filePath);
+                return RedirectToAction("Index");
+            }
 
-            int maxMinutes = GetTotalMinutesRange(fileName);
+            var cameraPositions = GetCameraPositionsFromCSV(filePath);
+
+            int maxMinutes = GetTotalMinutesRange(filePath);
             ViewBag.MaxMinutes = maxMinutes;
             #endregion
             return Index(cameraPositions);
+        }
+
+        private string validatesFile(string fileName)
+        {
+            string error = "";
+
+            //Read CSV file
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
+            using (var reader = new StreamReader(filePath))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+
+                csv.Read();
+                csv.ReadHeader();
+                string header = csv.HeaderRecord[2];
+                string cameraPositionModel = nameof(CameraPosition.CameraActive);
+
+
+                if (header != cameraPositionModel)
+                {
+                    error = "Header is not matched, Please upload correct CSV file";
+                }
+            }
+
+
+
+            return error;
         }
 
         private List<CameraPosition> GetCameraPositionsFromCSV(string filePath)

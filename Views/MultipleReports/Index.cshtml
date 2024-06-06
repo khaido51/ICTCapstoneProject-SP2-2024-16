@@ -239,7 +239,7 @@
 <div class="container px-4">
     <div class="row gx-4 justify-content-center">
         <div class="col-lg-10">
-   
+            <!--
             @if (Model.selfReportsDictionary != null && Model.selfReportsDictionary.Count > 0)
             {
                 @foreach (var selfReportDic in Model.selfReportsDictionary)
@@ -270,7 +270,7 @@
                 
                 <p class="overflow-hidden">No Data</p>
             }
-            
+            -->
             <h2>Average Table</h2>
             @if (Model.averageSelfReport != null && Model.averageSelfReport.Count > 0)
             {
@@ -316,41 +316,19 @@
     <script>alert('@TempData["message"]');</script>
 }
 
-<script>
-    // Get the file input element
-    const fileInput = document.getElementById('uploadFile');
-
-    // Add an event listener to handle file selection
-    fileInput.addEventListener('change', handleFileSelect);
-
-    function handleFileSelect(event) {
-        // Get the selected files
-        const files = event.target.files;
-
-        // Iterate over each selected file
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-
-            // Here, you can perform any processing or validation on the file
-            // For example, you can upload the file using AJAX
-
-            // Display a message for each selected file
-            console.log(`Selected file: ${file.name}`);
-        }
-    }
-</script>
 
 
 
 <body>
-    <div id="graph-container">
+    <button id="downloadButton">Download as PNG</button>
+    <div id="graph-container"> 
     <script src="https://d3js.org/d3.v7.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
            
             var selfReportsDictionaryJson = @Html.Raw(Json.Serialize(Model.selfReportsDictionary));
             console.log(selfReportsDictionaryJson);
-
+            /*
             var selfReportsArray = [];
             for (var key in selfReportsDictionaryJson) {
                 if (selfReportsDictionaryJson.hasOwnProperty(key)) {
@@ -430,7 +408,10 @@
                     .attr("d", lineSelfReport);
 
             });
+            */
 
+            //Set dimensions and margins for the graph
+            //Construct the margin for the graph and tick label//
             const margin = { top: 70, right: 30, bottom: 40, left: 80 };
             const width = 1200 - margin.left - margin.right;
             const height = 500 - margin.top - margin.bottom;
@@ -450,7 +431,7 @@
                 .attr("transform", `translate(${margin.left},${margin.top})`);
 
 
-            //create a dump dataset
+            //Dataset conversion from Model to Json
             var selfReports = @Html.Raw(Json.Serialize(Model.averageSelfReport));
             console.log(selfReports);
 
@@ -461,15 +442,16 @@
                 d.selfReport = +d.selfReport; // Convert to number using unary operator
             });
             */
-            // Define the x and y domains
 
+            // Define the x and y domains
+            //X-axis use d3.extent means getting the min segment value to the max segment value in selfReport List
             x.domain(d3.extent(selfReports, s => s.segment));
+            //Y-axis domian will be use from 0 to the max value of selfReport in selfReport list.
             y.domain([0, d3.max(selfReports, s => s.selfReport)]);
 
-            // y.domain([0, d3.max(selfReports, s => s.selfReport)]);
+          
 
             // Add the x-axis
-
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
                 .call(d3.axisBottom(x)
@@ -494,17 +476,61 @@
                 .attr("stroke-width", 3)
                 .attr("d", lineSelfReport);
 
-      
-        
-    </script>
+            //Add Y-axis label
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("font-size", "14px")
+                .style("font-family", "sans-serif")
+                .text("Self Report");
+
+            //Add the X-axis label
+            svg.append("text")
+                .attr("class", "xLabel")
+                .attr("x", width - 600)
+                .attr("y", height + margin.bottom - 3)
+                .style("font-size", "14px")
+                .style("font-family", "sans-serif")
+                .text("Segment");
+
+
+            //Add the chart title
+            svg.append("text")
+                .attr("class", "chart-title")
+                .attr("x", margin.left - 115)
+                .attr("y", margin.top - 100)
+                .style("font-size", "24px")
+                .style("font-weight", "bold")
+                .style("font-family", "sans-serif")
+                .text("Multiple Self-Reports Graph");
+
+       
+            // Function to download the SVG as PNG
+            function downloadSVGAsPNG() {
+                const svgElement = document.querySelector("#graph-container");
+                html2canvas(svgElement).then(canvas => {
+                    // Get the image data as a base64-encoded string
+                    const imageData = canvas.toDataURL("image/png");
+                    //Saving image as a png file
+                    //Create an anchor element and trigger a download action
+                    const link = document.createElement("a");
+                    link.setAttribute("download", "graph.png");
+                    link.setAttribute("href", imageData);
+                    link.click();
+
+
+                });
+            }
+
+            document.getElementById("downloadButton").addEventListener("click", downloadSVGAsPNG);
+
+
+
+
+        </script>
       
     </div>
-
-    <script>
-        function download() {
-            const imageLink = document.createElement('a');
-            const canvas = document.getElementById("graph-container");
-        }
-    </script>
-
+    
 </body>

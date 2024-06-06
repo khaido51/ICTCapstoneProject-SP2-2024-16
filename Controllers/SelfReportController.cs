@@ -24,6 +24,16 @@ namespace ICTCapstoneProject.Controllers
             return View(selfReports);
         }
 
+        /// <summary>
+        /// Recevied the file from view 
+        /// now process 
+        /// </summary>
+        /// <param name="baselineFiles"></param>
+        /// <param name="passiveFiles"></param>
+        /// <param name="activeFiles"></param>
+        /// <returns>
+        /// Return the list of selfReport to index page in view 
+        /// </returns>
         [HttpPost]
         public IActionResult Index(List<IFormFile> baselineFiles, List<IFormFile> passiveFiles, List<IFormFile> activeFiles)
         {
@@ -47,6 +57,7 @@ namespace ICTCapstoneProject.Controllers
             return Index(selfReports);
         }
 
+       
         private List<SingleSelfReport> ProcessFiles(List<IFormFile> files, string sceneType)
         {
             List<SingleSelfReport> selfReports = new List<SingleSelfReport>();

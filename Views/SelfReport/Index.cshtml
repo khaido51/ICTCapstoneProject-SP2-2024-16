@@ -62,6 +62,7 @@
     </div>
 </section>
 
+<button id="downloadButton">Download as PNG</button>
 <div id="chart-container" class="container px-4"></div>
 <div>
     <input type="checkbox" id="showBaseline" checked> Baseline
@@ -104,6 +105,7 @@
 
 <body>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         .line {
             fill: none;
@@ -214,6 +216,25 @@
         document.getElementById("showBaseline").addEventListener("change", updateChart);
         document.getElementById("showPassive").addEventListener("change", updateChart);
         document.getElementById("showActive").addEventListener("change", updateChart);
+
+        // Function to download the SVG as PNG
+        function downloadSVGAsPNG() {
+            const svgElement = document.querySelector("#chart-container");
+            html2canvas(svgElement).then(canvas => {
+                // Get the image data as a base64-encoded string
+                const imageData = canvas.toDataURL("image/png");
+                //Saving image as a png file
+                //Create an anchor element and trigger a download action
+                const link = document.createElement("a");
+                link.setAttribute("download", "graph.png");
+                link.setAttribute("href", imageData);
+                link.click();
+
+            });
+        }
+
+        document.getElementById("downloadButton").addEventListener("click", downloadSVGAsPNG);
+
     </script>
 </body>
 
