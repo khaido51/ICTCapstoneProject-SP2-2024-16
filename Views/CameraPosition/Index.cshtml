@@ -231,7 +231,7 @@
                 <option value="Rotation">Rotation graphs(Camera Rotation & Angular Velocity)</option>
             </select>
         </div>
-        <div class="col-lg-8">
+        <div class="col-lg-8" id="axisSelectionContainer">
             <label>
                 <input type="radio" name="axis" class="radio" value="X" checked />X
             </label>
@@ -426,7 +426,15 @@
             // Get selected graph type from the dropdown
             const selectedGraph = document.getElementById("graphSelector").value;
             // Get selected axix from check box
-            const selectedAxis = document.querySelector('input[name="axis"]:checked').value;
+            const axisSelectionContainer = document.getElementById("axisSelectionContainer");
+
+            if (selectedGraph === "3D") {
+                axisSelectionContainer.style.display = 'none';
+            } else {
+                axisSelectionContainer.style.display = 'block';
+            }
+
+            const selectedAxis = document.querySelector('input[name="axis"]:checked')?.value;
 
             // Hide all graphs
             document.getElementById('plotlyGraph').style.display = 'none';
@@ -467,6 +475,8 @@
             const axisRadios = document.querySelectorAll('input[name="axis"]');
             const plotlyGraph = document.getElementById("plotlyGraph");
             const loadMoreButton = document.getElementById("loadMore");
+            const axisSelectionContainer = document.getElementById("axisSelectionContainer");
+
 
             // Check if DOM elements are found
             if (graphSelector && axisRadios.length > 0 && plotlyGraph) {
