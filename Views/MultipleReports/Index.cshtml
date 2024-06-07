@@ -432,6 +432,9 @@
 
 
             //Dataset conversion from Model to Json
+            //Serialize the model property into JSON string
+            //Output the JSON string as raw HTML into the view
+            //Assign the JSON string to JS variable
             var selfReports = @Html.Raw(Json.Serialize(Model.averageSelfReport));
             console.log(selfReports);
 
@@ -454,26 +457,32 @@
             // Add the x-axis
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
+                //call d3.axisBottom cause x-axis need to align wtih the bottom of the canvas
                 .call(d3.axisBottom(x)
+                  //number of ticks on label
                  .ticks(10)
+                 //format the number as an integers
                  .tickFormat(d3.format("d")));
 
             //Add the y-axis
             svg.append("g")
+                //call d3.axisLeft cause y-axis need to align to the left of the canvas
                 .call(d3.axisLeft(y))
 
             //Create the line generator
-         
+            //call d3.line() to draw a line
             const lineSelfReport = d3.line()
                 .x(s => x(s.segment))
                 .y(s => y(s.selfReport));
 
             //Add the lineSegment to the SVG element
             svg.append("path")
+                //use the selfReport list data
                 .datum(selfReports)
                 .attr("fill", "none")
                 .attr("stroke", "red")
                 .attr("stroke-width", 3)
+                //draw a line
                 .attr("d", lineSelfReport);
 
             //Add Y-axis label
@@ -523,7 +532,7 @@
 
                 });
             }
-
+            //call the function to when user click on the button
             document.getElementById("downloadButton").addEventListener("click", downloadSVGAsPNG);
 
 

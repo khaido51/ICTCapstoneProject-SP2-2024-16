@@ -42,6 +42,7 @@ namespace ICTCapstoneProject.Controllers
         /// Return the list of GSR object to index page.
         /// </returns>
         //Receive the file in Index function parameter passing from the view
+
         [HttpPost]
         public IActionResult Index(IFormFile file)
         {
@@ -156,14 +157,20 @@ namespace ICTCapstoneProject.Controllers
             //var config = CsvConfiguration.FromAttributes<GSR>();
 
             #region Read CSV
+            //locate the filePath
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", fileName);
+            //Reconfigure to read the file since GSR csv structure is seperated by tab
             var config = new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = "\t" };
+
+            //StreamReader from StreamReader class that use to read text from a file
             using (var reader = new StreamReader(filePath))
             using (var csv = new CsvReader(reader, config))
             {
+                //doesn't read, steps down to the first record
                 csv.Read();
                 csv.Read();
                 csv.Read();
+                //Read the row into CsvHelper as the header values
                 csv.ReadHeader();
                 //string test = csv.HeaderRecord[0];
 
@@ -171,6 +178,7 @@ namespace ICTCapstoneProject.Controllers
                 //To create the time label, 
                 //t = [0:1 / Fs:(L - 1) / Fs]
 
+                //Read each row of csv file
                 while (csv.Read())
                 { 
                     //Iterate through each record

@@ -157,14 +157,19 @@ namespace ICTCapstoneProject.Controllers
                 //read each file from the list of file
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files", file);
 
-                using(var reader = new StreamReader(filePath))
+                //StreamReader from StreamReader class that use to read text from a file
+                using (var reader = new StreamReader(filePath))
                 using(var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
                   
                     selfReports = new List<SelfReport>();
-                    
-                    csv.Read(); 
+
+                    //doesn't read, steps down to the first record
+                    csv.Read();
+                    //Read the row into CsvHelper as the header values
                     csv.ReadHeader();
+
+                    //Read each row of csv file
                     while (csv.Read())
                     {
                         //Iterate each record with SelfReport type to create an object

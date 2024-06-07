@@ -162,7 +162,9 @@
 
     
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!--D3 Simple Slider script-->
     <script src="https://unpkg.com/d3-simple-slider"></script>
+    <!--Html2Canvas Script-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         .bar {
@@ -222,7 +224,9 @@
             //console.log(dayTest);
             const timeString = d.xValueTspan;
             //console.log(timeString);
+            //Seperate the timeString in 3 parts HH:MM:SS by colon
             const parts = timeString.split(":");
+
             const minutes = parseInt(parts[1], 10);
             const seconds = parseInt(parts[2]);
 
@@ -272,18 +276,26 @@
             .attr("stroke-width", 3)
             .attr("d", msLine);
 
-        // Slider configuration
+        //Horizontal Slider configuration
         const horizontalSlider = d3.sliderBottom()
+            //set the minimum value of the slider to the minimum value in dataset
             .min(d3.min(gsrReport, d => d.xValueTspan))
+            //set the maximum value of the slider to the maximum value in dataset
             .max(d3.max(gsrReport, d => d.xValueTspan))
+            //width of the slider
             .width(400)
+            //Only show minutes and second value
             .tickFormat(d3.timeFormat("%M:%S"))
             .ticks(3)
+            //default domain
             .default(horizontalRange)
             .fill('#85bb65');
-
+        
+        //Vertical Slider configuration
         const verticalSlider = d3.sliderLeft()
+            //set the minimum value of the slider to 0 
             .min(0)
+            //set the maximum value of the slider to the maximum value in dataset
             .max(d3.max(gsrReport, d => d.uS))
             .height(250)
             .ticks(5)
@@ -295,7 +307,9 @@
         function updateGraph() {
             //filtering data between min and max value range from user's input for both xaxis and yaxis
             const filteredData = gsrReport.filter(d => 
+                    //Filtering the new minnum and maximum of xValueTspan that falls into new range
                     d.xValueTspan >= horizontalRange[0] && d.xValueTspan <= horizontalRange[1]
+                //Filtering the new minnum and maximum of uS that falls into new range
                     && d.uS >= verticalRange[0] && d.uS <= verticalRange[1]
             );
 
@@ -325,15 +339,21 @@
                 .attr("d", line);
         }
 
-        // Horizontal slider onchange
+        // Horizontal slider onchange, give a onchange function called the val 
         horizontalSlider.on('onchange', val => {
+            //When slide the slider, it will update the array value of minimum and maximum to the domain
+            //default value set in slider configuration
             horizontalRange = val;
+            //update the graph on new val
             updateGraph();
         });
 
-        // Vertical slider onchange
+        // Vertical slider onchange, give a onchange function called the val
         verticalSlider.on('onchange', val => {
+            //When slide the slider, it will update the array value of minimum and maximum to the domain
+            //default value set in slider configuration
             verticalRange = val;
+            //update the graph on new val
             updateGraph();
         });
 
@@ -356,17 +376,20 @@
             .call(verticalSlider);
 
         //Download Image// Function to download the SVG as PNG
-        // Function to download the SVG as PNG
         function downloadSVGAsPNG() {
             const svgElement = document.querySelector("#chart-container");
+            //Render SVG as canvas
             html2canvas(svgElement).then(canvas => {
                 // Get the image data as a base64-encoded string
                 const imageData = canvas.toDataURL("image/png");
                 //Saving image as a png file
                 //Create an anchor element and trigger a download action
                 const link = document.createElement("a");
+                //download attribute set to graph.png
                 link.setAttribute("download", "graph.png");
+                //Used to create a link to download the image
                 link.setAttribute("href", imageData);
+                //Trigger download event
                 link.click();
           
             });
