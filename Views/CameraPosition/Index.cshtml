@@ -163,9 +163,18 @@
         padding-left: 4rem;
     }
 
+    .3Dgraph-container {
+        width: 100%;
+        height: 300px;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .graph-container {
         width: 100%;
-        height: 500px;
+        height: 300px;
         margin: auto;
         display: flex;
         justify-content: center;
@@ -245,7 +254,7 @@
     </div>
 </div>
 
-<div id="plotlyGraph" class="graph-container" style="display: none;"></div>
+<div id="plotlyGraph" class=".3Dgraph-container" style="display: none;"></div>
 <div id="plotlyGraphAcceleration" class="graph-container" style="display: none;"></div>
 <div id="plotlyGraphAngularVelocity" class="graph-container" style="display: none;"></div>
 <div id="plotlyGraphRotationX" class="graph-container" style="display: none;"></div>
@@ -387,6 +396,18 @@
 
         let displayedRows = 10; // Rows displayed
 
+        // Function to toggle the visibility of the axis selection container
+        function toggleAxisSelectionContainer() {
+            const selectedGraph = document.getElementById("graphSelector").value;
+            const axisSelectionContainer = document.getElementById("axisSelectionContainer");
+
+            if (selectedGraph === "3D") {
+                axisSelectionContainer.style.display = 'none';
+            } else {
+                axisSelectionContainer.style.display = 'block';
+            }
+        }
+
         /**
         * <summary>
         * This function improves performance 
@@ -427,13 +448,6 @@
             const selectedGraph = document.getElementById("graphSelector").value;
             // Get selected axix from check box
             const axisSelectionContainer = document.getElementById("axisSelectionContainer");
-
-            if (selectedGraph === "3D") {
-                axisSelectionContainer.style.display = 'none';
-            } else {
-                axisSelectionContainer.style.display = 'block';
-            }
-
             const selectedAxis = document.querySelector('input[name="axis"]:checked')?.value;
 
             // Hide all graphs
@@ -475,24 +489,23 @@
             const axisRadios = document.querySelectorAll('input[name="axis"]');
             const plotlyGraph = document.getElementById("plotlyGraph");
             const loadMoreButton = document.getElementById("loadMore");
-            const axisSelectionContainer = document.getElementById("axisSelectionContainer");
 
 
             // Check if DOM elements are found
             if (graphSelector && axisRadios.length > 0 && plotlyGraph) {
+                graphSelector.addEventListener("change", () => {
+                    toggleAxisSelectionContainer();
+                    optimizedFilterGraphData();
+                });
 
-                // Add change event listeners to the graph selector dropdown
-                graphSelector.addEventListener("change", optimizedFilterGraphData);
-
-                // Add change event listeners to the each axis radio button
                 axisRadios.forEach((radio) => {
                     radio.addEventListener("change", optimizedFilterGraphData);
                 });
 
-                // Display Initial 3D graph
+                // Display Initial 3D graph and hide axis selection container
                 plotlyGraph.style.display = 'block';
+                toggleAxisSelectionContainer();
                 renderPlotlyGraph(modelData);
-
             } else {
                 console.error("Cannot find required DOM elements");
             }
