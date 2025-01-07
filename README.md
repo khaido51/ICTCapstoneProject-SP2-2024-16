@@ -1,5 +1,3 @@
-![Camera_Position_Page](https://github.com/user-attachments/assets/70ac0287-7d8e-43b4-80db-439f640a74cc)# ICTCapstoneProject
-
 *****Detecting Of Onset Of Cybersickness Using Physiological Cues******
 
 This repository is stroing the Web application that assist UniSA researcher to visualization data in graphs.
