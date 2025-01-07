@@ -1,4 +1,4 @@
-# ICTCapstoneProject
+![Camera_Position_Page](https://github.com/user-attachments/assets/70ac0287-7d8e-43b4-80db-439f640a74cc)# ICTCapstoneProject
 
 *****Detecting Of Onset Of Cybersickness Using Physiological Cues******
 
@@ -34,8 +34,21 @@ The following screenshots will demonstrate the working flow of the web applicati
 ![Multiple_Report_Page](https://github.com/user-attachments/assets/9d293ca5-54d6-44e6-baa0-62df8e5b9c12)<br> <br>
 ** Now user can click choose file button to submuit their files (3 files uploading in this example)<br>
 ![Upload3Files](https://github.com/user-attachments/assets/6b8442ac-b190-41c1-af61-167f53eaebb7) <br> <br>
-** Once click submit, the graph will display alongside with the avrage value based on their submitted CSV files data.
+** Once click submit, the graph will display alongside with the avrage value table, calculating based on their submitted CSV files data.
 ![Multi_Graph](https://github.com/user-attachments/assets/1b48478e-0773-4b9d-bac0-1606bf146a9b)
+
+4. Camera 3D Position Page <br><br>
+** In this page, user only submit a single file, requiring to submit correct CSV file, otherwise it will reject and ask to resubmit <br>
+![Camera_Position_Page](https://github.com/user-attachments/assets/9292ff24-48ab-44d3-8caf-1f4106a3f258)<br> <br>
+** After submitting the file, user will have plenty option to view the graph by rotating it, zooming in or out, choosing the right axis, etc.
+![Camera_Graph](https://github.com/user-attachments/assets/fb2bb624-7371-4bb7-9bf9-771d7ba1a6df)<br> <br>
+
+5. GSR Page <br>
+** In this page, user only submit a single file, requiring to submit correct CSV file, otherwise it will reject and ask to resubmit <br>
+![GSR_Page](https://github.com/user-attachments/assets/a28da1d6-3744-4cef-811d-ec63338501db)<br> <br>
+** After submitting the file, the graph will display and user can use sliders on both vertical and horizontal by draging to their desire timeframe value, the graph will change accordingly.<br> 
+![GSR_Graph](https://github.com/user-attachments/assets/9370657d-f649-465a-9d73-2e10286a1fc3)<br> <br>
+
 
 
  The URL of the website https://datavisualization.azurewebsites.net/ 
