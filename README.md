@@ -15,4 +15,10 @@ Web Application Core Feature:<br>
   *Download graph as PNG file <br>
  <br>
 
+The following screenshots will demonstrate the working flow of the web application.
+
+1. Home Page
+
+![Home](https://github.com/user-attachments/assets/6d9ce97a-c280-4050-b490-811988a161e2)
+
  The URL of the website https://datavisualization.azurewebsites.net/ 
